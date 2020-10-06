@@ -1,12 +1,12 @@
 # Frends.Community.Xml
 
-frends Community Task for XmlTasks
+Frends Community Task library for XML operations
 
 [![Actions Status](https://github.com/CommunityHiQ/Frends.Community.Xml/workflows/PackAndPushAfterMerge/badge.svg)](https://github.com/CommunityHiQ/Frends.Community.Xml/actions) ![MyGet](https://img.shields.io/myget/frends-community/v/Frends.Community.Xml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
 
 - [Installing](#installing)
 - [Tasks](#tasks)
-     - [XmlTasks](#XmlTasks)
+     - [SplitXMLFile](#SplitXMLFile)
 - [Building](#building)
 - [Contributing](#contributing)
 - [Change Log](#change-log)
@@ -18,35 +18,32 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 
 # Tasks
 
-## XmlTasks
+## SplitXMLFile
 
-Repeats a message
+Splits XML file into smaller XML files. This allows processing bigger (>2GB) XML files that otherwise could cause performance issues.
 
-### Properties
+### Input
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Message | `string` | Some string that will be repeated. | `foo` |
+| InputFilePath | `string` | Path of input file. | `F:\myfile.xml` |
+| SplitAtElementName | `string` |  Name of the XML elements which are copied to output files. | `Product` |
+| OutputFilesDirectory | `string` | Output directory for new files. | `F:\output` |
 
 ### Options
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Amount | `int` | Amount how many times message is repeated. | `3` |
-| Delimiter | `string` | Character(s) used between replications. | `, ` |
+| ElementCountInEachFile | `int` | Maximum number of chosen elements to be written in each file. | `5000` |
+| OutputFileRootNodeName | `string` | Root element of output file. | `Root` |
 
-### Returns
+### Returns SplitXMLFileResult
 
 A result object with parameters.
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Replication | `string` | Repeated string. | `foo, foo, foo` |
-
-Usage:
-To fetch result use syntax:
-
-`#result.Replication`
+| FilePaths | `List<string>` | List of new files. | `"F:\output\myfile.xml.0.part","F:\output\myfile.xml.1.part"` |
 
 # Building
 
@@ -81,4 +78,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 | Version | Changes |
 | ------- | ------- |
-| 0.0.1   | Development still going on |
+| 1.0.0   | First version. Includes task SplitXMLFile |

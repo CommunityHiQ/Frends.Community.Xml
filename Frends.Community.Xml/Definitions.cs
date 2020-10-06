@@ -26,7 +26,7 @@ namespace Frends.Community.Xml
         /// Output directory for new files
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
-        [DefaultValue(@"F:\outputfolder")]
+        [DefaultValue(@"F:\output")]
         public string OutputFilesDirectory { get; set; }
     }
 
@@ -35,14 +35,14 @@ namespace Frends.Community.Xml
         /// <summary>
         /// Maximum number of chosen elements to be written in each file
         /// </summary>
-        [DefaultValue(50)]
+        [DefaultValue(5000)]
         public int ElementCountInEachFile { get; set; }
 
         /// <summary>
         /// Root element of output file
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
-        [DefaultValue("RootElement")]
+        [DefaultValue("Root")]
         public string OutputFileRootNodeName { get; set; }
     }
 
