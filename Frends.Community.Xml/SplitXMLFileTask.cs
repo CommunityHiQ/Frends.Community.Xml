@@ -10,6 +10,10 @@ namespace Frends.Community.Xml
 {
     public static class XmlTasks
     {
+        /// <summary>
+        /// Splits XML file into smaller files. See https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// </summary>
+        /// <returns>Object { List&lt;string&gt; FilePaths } </returns>
         public static SplitXMLFileResult SplitXMLFile([PropertyTab]SplitXMLFileInput Input, [PropertyTab]SplitXMLFileOptions Options, CancellationToken cancellationToken)
         {
             int seqNr = 0;
