@@ -74,7 +74,7 @@ namespace Frends.Split.Tests
         }
 
         [Test]
-        public void TestMinifiedXML_uneven()
+        public void TestPrettyXML_uneven()
         {
             var input = new SplitXMLFileInput() { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
             var opt = new SplitXMLFileOptions() { ElementCountInEachFile = 10, OutputFileRootNodeName = "root" };
@@ -94,7 +94,7 @@ namespace Frends.Split.Tests
         }
 
         [Test]
-        public void TestPretty_notfull()
+        public void TestPrettyXML_notfull()
         {
             string expectedRootElement = "TestRoot";
 
