@@ -63,6 +63,14 @@ namespace Frends.Split.Tests
             var id = ExecuteXpath(result.FilePaths.First(), "string(/root/Product[last()]/id)");
             Assert.AreEqual("4", id);
 
+            //The second file should have 4 products
+            var productCount2nd = ExecuteXpath(result.FilePaths[1], "string(count(/root/Product))");
+            Assert.AreEqual("4", productCount2nd);
+
+            //The Last Product of second file should have id 8
+            var id2nd = ExecuteXpath(result.FilePaths[1], "string(/root/Product[last()]/id)");
+            Assert.AreEqual("8", id2nd);
+
         }
 
         [Test]
@@ -86,7 +94,7 @@ namespace Frends.Split.Tests
         }
 
         [Test]
-        public void TestOutputRootElement()
+        public void TestPretty_notfull()
         {
             string expectedRootElement = "TestRoot";
 
@@ -95,8 +103,13 @@ namespace Frends.Split.Tests
 
             var result = XmlTasks.SplitXMLFile(input, opt, new CancellationToken());
 
+            //Check root element
             var rootElementName = ExecuteXpath(result.FilePaths.Last(), "local-name(/*)");
             Assert.AreEqual(expectedRootElement, rootElementName);
-        }                
+
+            //The Last Product of first file should have id 12
+            var id = ExecuteXpath(result.FilePaths.First(), "string(/TestRoot/Product[last()]/id)");
+            Assert.AreEqual("12", id);
+        }        
     }
 }

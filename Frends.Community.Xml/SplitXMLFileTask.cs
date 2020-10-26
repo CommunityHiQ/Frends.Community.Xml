@@ -45,9 +45,7 @@ namespace Frends.Community.Xml
                         // Write new file when the max element count is reached
                         if (++loopSeqNr >= Options.ElementCountInEachFile)
                         {
-                            string strFileName = fileInfo.Name + "." + seqNr++ + ".part";
-                            string outputFilePath = Path.Combine(dirInfo.FullName, strFileName);
-                            newDoc.Save(outputFilePath);
+                            string outputFilePath = WriteToFile(fileInfo.Name, seqNr++, dirInfo.FullName, newDoc);
                             returnArray.Add(outputFilePath);
                             loopSeqNr = 0;
                             newDoc = InitiateNewDocument(Options.OutputFileRootNodeName);
@@ -58,9 +56,7 @@ namespace Frends.Community.Xml
                 // If there are any leftover elements we create one last file
                 if (processDoc.ReadState == ReadState.EndOfFile && loopSeqNr != 0)
                 {
-                    string strFileName = fileInfo.Name + "." + seqNr + ".part";
-                    string outputFilePath = Path.Combine(dirInfo.FullName, strFileName);
-                    newDoc.Save(outputFilePath);
+                    string outputFilePath = WriteToFile(fileInfo.Name, seqNr, dirInfo.FullName, newDoc);
                     returnArray.Add(outputFilePath);
                 }
             }
@@ -79,6 +75,15 @@ namespace Frends.Community.Xml
             newDoc.AppendChild(rootElement);
 
             return newDoc;
+        }
+
+        public static string WriteToFile(string InputName, int SeqNr, string OutputFolder, XmlDocument NewDoc)
+        {
+            string strFileName = InputName + "." + SeqNr + ".part";
+            string outputFilePath = Path.Combine(OutputFolder, strFileName);
+            NewDoc.Save(outputFilePath);
+
+            return outputFilePath;
         }
     }
 }

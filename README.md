@@ -22,6 +22,44 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 
 Splits XML file into smaller XML files. This allows processing bigger (>2GB) XML files that otherwise could cause performance issues.
 
+Example input XML file: 
+```xml
+<root>
+    <Product>
+        <id>1</id>
+    </Product>
+    <Product>
+        <id>2</id>
+    </Product>
+    <Product>
+        <id>3</id>
+    </Product>
+</root>
+```
+
+Example output files when value of ElementCountInEachFile is 2:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <Product>
+        <id>1</id>
+    </Product>
+  <Product>
+        <id>2</id>
+    </Product>
+</root>
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <Product>
+        <id>3</id>
+    </Product>
+</root>
+```
+
 ### Input
 
 | Property | Type | Description | Example |
