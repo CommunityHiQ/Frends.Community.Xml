@@ -6,7 +6,8 @@ Frends Community Task library for XML operations
 
 - [Installing](#installing)
 - [Tasks](#tasks)
-     - [CombineXML](#combineXML)
+     - [CombineXML](#CombineXML)
+     - [ConvertToXML](#ConvertToXML)
      - [SplitXMLFile](#SplitXMLFile)
 - [Building](#building)
 - [Contributing](#contributing)
@@ -29,21 +30,51 @@ Combines two or more xml strings or xml documents to one xml string
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
 | InputXmls | InputXml[] | Xml strings or xml documents that will be merged | n/a |
-| XmlRootElementName| string | Root element of xml| 'Root' |
+| XmlRootElementName| ``string`` | Root element of xml | `Root` |
 
 #### InputXml
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Xml| object | Xml input as string or xml document | `<note><body>Hello!</body></note> `|
-| ChildElementName| string | Child element name where the xml document will be written in| 'ChildElement1' |
+| Xml| ``object`` | Xml input as string or xml document | `<note><body>Hello!</body></note>` |
+| ChildElementName| ``string`` | Child element name where the xml document will be written in| `ChildElement1` |
 
 
 ### Returns
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Xml| string| Combined xml as string | ``<root><child1><note1><body1>Hello!</body1></note1></child1><child2><note2<body2>Hello2!</body2></note2></child2></root>``
+| Xml | ``string`` | Combined xml as string | ``<root><child1><note1><body1>Hello!</body1></note1></child1><child2><note2<body2>Hello2!</body2></note2></child2></root>``
+
+## ConvertToXML
+
+### Parameters
+
+| Property				|  Type   | Description								| Example                     |
+|-----------------------|---------|-----------------------------------------|-----------------------------|
+| Input					| ``string`` | Supported formats JSON, CSV and fixed length | `first;second;third` |
+
+### CsvInputParameters
+
+| Property				|  Type   | Description								| Example                     |
+|-----------------------|---------|-----------------------------------------|-----------------------------|
+| CSVSeparator			| ``string`` | CSV separator	| `;` |
+| ColumnLengths			| ``array<int>`` | Column lengths of fixed lenght input. These are used if CSV separator is not defined.	|  |
+| InputHasHeaderRow		| ``bool`` | Input has header row	| `false` |
+| TrimOuputColumns		| ``bool`` | Trim ouput columns of CVS input	| `true` |
+
+### JsonInputParameters
+
+| Property				|  Type   | Description								| Example                     |
+|-----------------------|---------|-----------------------------------------|-----------------------------|
+| XMLRootElementName	| ``string`` | Root name for when parsing JSON| `Root`	|
+| AppendWith			| ``string`` | Append numeric JSON fields with prefix	| `foo_` |
+
+### Result
+
+| Property      | Type     | Description                      | Example                     |
+|---------------|----------|----------------------------------|-----------------------------|
+| Result        | ``string`` | Result as XML	| `<NewDataSet><Table1><Column1>first</Column1><Column2>second</Column2><Column3>third</Column3></Table1></NewDataSet>` |
 
 ## SplitXMLFile
 
@@ -144,4 +175,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | Version | Changes |
 | ------- | ------- |
 | 1.0.0   | First version. Includes task SplitXMLFile |
-| 2.0.0   | CombineXML task included. |
+| 2.0.0   | CombineXML and ConvertToXML tasks included. |

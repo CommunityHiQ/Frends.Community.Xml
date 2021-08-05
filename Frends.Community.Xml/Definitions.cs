@@ -36,6 +36,65 @@ namespace Frends.Community.Xml
         public string ChildElementName { set; get; }
     }
 
+    public class ColumnLength
+    {
+        /// <summary>
+        /// Column length
+        /// </summary>
+        public int Length { set; get; }
+    }
+
+    public class ConvertJsonToXMLParameters
+    {
+        /// <summary>
+        /// XML root element name
+        /// </summary>
+        public string XMLRootElementName { get; set; }
+
+        /// <summary>
+        /// Json change numeric keys
+        /// </summary>
+        public string AppendToFieldName { get; set; }
+    }
+
+    public class ConvertCSVtoXMLParameters
+    {
+        /// <summary>
+        /// CSV separator
+        /// </summary>
+        public string CSVSeparator { get; set; }
+
+        /// <summary>
+        /// Output column lengths
+        /// </summary>
+        public ColumnLength[] ColumnLengths { get; set; }
+
+        /// <summary>
+        /// Input has header row
+        /// </summary>
+        public bool InputHasHeaderRow { get; set; }
+
+        /// <summary>
+        /// Trim ouput columns
+        /// </summary>
+        public bool TrimOuputColumns { get; set; }
+    }
+    public class ConvertToXMLInput
+    {
+        /// <summary>
+        /// Input data. Supported formats JSON, CSV and fixed length
+        /// </summary>
+        public string Input { get; set; }
+    }
+
+    public class ConvertToXMLOutput
+    {
+        /// <summary>
+        /// Result string
+        /// </summary>
+        public string Result { get; set; }
+    }
+
     public class SplitXMLFileInput
     {
         /// <summary>
@@ -75,7 +134,6 @@ namespace Frends.Community.Xml
         [DefaultValue("Root")]
         public string OutputFileRootNodeName { get; set; }
     }
-
 
     public class SplitXMLFileResult
     {

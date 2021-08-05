@@ -1,4 +1,7 @@
-﻿using System;
+﻿using GenericParsing;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -72,8 +75,77 @@ namespace Frends.Community.Xml
         }
 
         /// <summary>
+        /// Task parses input data into XML data.
+        /// Supported input formats JSON, CSV and fixed-length.
+        /// </summary>
+        /// <param name="parameters">JSON or CSV string to be converted.</param>
+        /// <param name="csvInputParameters">Parameters for conversion from CSV to XML.</param>
+        /// <param name="jsonInputParameters">Parameters for conversion from JSON to XML.</param>
+        /// <returns>Object { string Result }</returns>
+        public static ConvertToXMLOutput ConvertToXML(ConvertToXMLInput parameters, [PropertyTab] ConvertCSVtoXMLParameters csvInputParameters, [PropertyTab] ConvertJsonToXMLParameters jsonInputParameters, CancellationToken cancellationToken)
+        {
+            if (parameters.Input.GetType() != typeof(string))
+                throw new InvalidDataException("The input data string was not in correct format. Supported formats are JSON, CSV and fixed length.");
+
+            if (parameters.Input.StartsWith("{") || parameters.Input.StartsWith("["))
+            {
+                if (string.IsNullOrEmpty(jsonInputParameters.XMLRootElementName))
+                    throw new MissingFieldException("Root element name missing. Required with JSON input");
+
+                if (jsonInputParameters.AppendToFieldName == null)
+                    return new ConvertToXMLOutput { Result = JsonConvert.DeserializeXmlNode(parameters.Input, jsonInputParameters.XMLRootElementName).OuterXml };
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var jsonObject = (JObject) JsonConvert.DeserializeObject(parameters.Input);
+                var newObject = ChangeNumericKeys(jsonObject, jsonInputParameters.AppendToFieldName);
+                return new ConvertToXMLOutput { Result = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(newObject), jsonInputParameters.XMLRootElementName).OuterXml };
+            }
+
+            if (!string.IsNullOrEmpty(csvInputParameters.CSVSeparator) && parameters.Input.Contains(csvInputParameters.CSVSeparator))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                using (var parser = new GenericParserAdapter())
+                {
+                    char? separator = Convert.ToChar(csvInputParameters.CSVSeparator);
+                    parser.SetDataSource(new StringReader(parameters.Input));
+                    parser.ColumnDelimiter = separator;
+                    parser.FirstRowHasHeader = csvInputParameters.InputHasHeaderRow;
+                    parser.MaxBufferSize = 4096;
+                    parser.TrimResults = csvInputParameters.TrimOuputColumns;
+                    return new ConvertToXMLOutput { Result = parser.GetXml().OuterXml };
+                }
+            }
+
+            if (csvInputParameters.ColumnLengths == null)
+                throw new InvalidDataException("The input was recognized as fixed length file, but no column lengths were supplied.");
+
+            using (var parser = new GenericParserAdapter())
+            {
+                var headerList = new List<int>();
+                foreach (var column in csvInputParameters.ColumnLengths)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    headerList.Add(column.Length);
+                }
+                var headerArray = headerList.ToArray();
+
+                parser.SetDataSource(new StringReader(parameters.Input));
+                parser.ColumnWidths = headerArray;
+                parser.FirstRowHasHeader = csvInputParameters.InputHasHeaderRow;
+                parser.MaxBufferSize = 4096;
+                parser.TrimResults = csvInputParameters.TrimOuputColumns;
+                return new ConvertToXMLOutput { Result = parser.GetXml().OuterXml };
+            }
+        }
+
+        /// <summary>
         /// Splits XML file into smaller files. See https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
+        /// <param name="Input">Input XML to be split.</param>
+        /// <param name="Options">Configuration for splitting the XML.</param>
         /// <returns>Object { List&lt;string&gt; FilePaths } </returns>
         public static SplitXMLFileResult SplitXMLFile([PropertyTab]SplitXMLFileInput Input, [PropertyTab]SplitXMLFileOptions Options, CancellationToken cancellationToken)
         {
@@ -145,6 +217,42 @@ namespace Frends.Community.Xml
             NewDoc.Save(outputFilePath);
 
             return outputFilePath;
+        }
+
+        private static JObject ChangeNumericKeys(JObject o, string appendWith)
+        {
+            var newO = new JObject();
+
+            foreach (var node in o)
+            {
+                switch (node.Value.Type)
+                {
+                    case JTokenType.Array:
+                        var newArray = new JArray();
+                        foreach (var item in node.Value)
+                        {
+                            newArray.Add(ChangeNumericKeys(JObject.FromObject(item), appendWith));
+                        }
+                        newO[node.Key] = newArray;
+                        break;
+                    case JTokenType.Object:
+                        newO[node.Key] = ChangeNumericKeys(JObject.FromObject(node.Value), appendWith);
+                        break;
+                    default:
+                        if (char.IsNumber(node.Key[0]))
+                        {
+                            var newName = appendWith + node.Key;
+                            newO[newName] = node.Value;
+                        }
+                        else
+                        {
+                            newO[node.Key] = node.Value;
+                        }
+                        break;
+                }
+            }
+
+            return newO;
         }
     }
 }

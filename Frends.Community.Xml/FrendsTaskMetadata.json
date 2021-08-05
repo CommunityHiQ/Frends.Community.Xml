@@ -4,6 +4,9 @@
 			"TaskMethod": "Frends.Community.Xml.XmlTasks.CombineXML"
 		},
 		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.ConvertToXML"
+		},
+		{
 			"TaskMethod": "Frends.Community.Xml.XmlTasks.SplitXMLFile"
 		}
 	]
