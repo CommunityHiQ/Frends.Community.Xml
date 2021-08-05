@@ -1,16 +1,24 @@
 using System;
 using NUnit.Framework;
-using Frends.Community.Xml;
 using System.Threading;
 using System.IO;
 using System.Xml;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace Frends.Split.Tests
+namespace Frends.Community.Xml.Tests
 {
     [TestFixture]
-    public class SplitXMLFileTests
+    public class XmlTasksTests
     {
+        private string _xmlString1;
+        private string _xmlString2;
+        private XmlDocument _xmlDoc1 = new XmlDocument();
+        private XmlDocument _xmlDoc2 = new XmlDocument();
+
+        private CombineXMLInput _input;
+        private CombineXMLInputXml[] _inputXmls = new CombineXMLInputXml[2];
+
         private string _minifiedInputPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestFiles\12_products_minified.xml");
         private string _prettyInputPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestFiles\12_products_pretty.xml");
         private string _tempOutputFolder;
@@ -19,6 +27,18 @@ namespace Frends.Split.Tests
         [SetUp]
         public void TestSetup()
         {
+            // CombineXML setup
+            _xmlString1 = "<?xml version=\"1.0\" encoding=\"utf-8\"?><bar1>foo1</bar1>";
+            _xmlString2 = "<?xml version=\"1.0\" encoding=\"utf-8\"?><bar2>foo2</bar2>";
+            _xmlDoc1.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><foo1>bar1</foo1>");
+            _xmlDoc2.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><foo2>bar2</foo2>");
+
+            _inputXmls[0] = new CombineXMLInputXml { ChildElementName = "XML1" };
+            _inputXmls[1] = new CombineXMLInputXml { ChildElementName = "XML2" };
+
+            _input = new CombineXMLInput { InputXmls = _inputXmls, XmlRootElementName = "Root" };
+
+            // SplitXml setup
             _tempOutputFolder = Path.Combine(Path.GetTempPath(), "splitxml_tests");
 
             if (!Directory.Exists(_tempOutputFolder))
@@ -43,7 +63,63 @@ namespace Frends.Split.Tests
 
             return result;
         }
-        
+
+        [Test]
+        public async Task ShouldCombineXmlStrings()
+        {
+            _inputXmls[0].Xml = _xmlString1;
+            _inputXmls[1].Xml = _xmlString2;
+
+            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            Assert.That(result, Is.EqualTo("<Root><XML1><bar1>foo1</bar1></XML1><XML2><bar2>foo2</bar2></XML2></Root>"));
+        }
+
+        [Test]
+        public async Task ShouldCombineXmlDocs()
+        {
+            _inputXmls[0].Xml = _xmlDoc1;
+            _inputXmls[1].Xml = _xmlDoc2;
+
+            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            Assert.That(result, Is.EqualTo("<Root><XML1><foo1>bar1</foo1></XML1><XML2><foo2>bar2</foo2></XML2></Root>"));
+        }
+
+        [Test]
+        public async Task ShouldCombineXmlStringAndXmlDoc()
+        {
+            _inputXmls[0].Xml = _xmlString1;
+            _inputXmls[1].Xml = _xmlDoc1;
+
+            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            Assert.That(result, Is.EqualTo("<Root><XML1><bar1>foo1</bar1></XML1><XML2><foo1>bar1</foo1></XML2></Root>"));
+        }
+
+        [Test]
+        public async Task ShouldCombineWithNewRootAndElementNames()
+        {
+            _inputXmls[0].Xml = _xmlString1;
+            _inputXmls[0].ChildElementName = "NEW_ELEMENT1";
+            _inputXmls[1].Xml = _xmlString2;
+            _inputXmls[1].ChildElementName = "NEW_ELEMENT2";
+            _input.XmlRootElementName = "NEW_ROOT";
+
+            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            Assert.That(result, Is.EqualTo("<NEW_ROOT><NEW_ELEMENT1><bar1>foo1</bar1></NEW_ELEMENT1><NEW_ELEMENT2><bar2>foo2</bar2></NEW_ELEMENT2></NEW_ROOT>"));
+        }
+
+        [Test]
+        public void ShouldNotCombineOtherObjects()
+        {
+            _inputXmls[0].Xml = _xmlString1;
+            _inputXmls[1].Xml = 123456;
+            Assert.ThrowsAsync<FormatException>(() => XmlTasks.CombineXML(_input, new CancellationToken()));
+
+            _inputXmls[0].Xml = new object();
+            _inputXmls[1].Xml = _xmlDoc2;
+            Assert.ThrowsAsync<FormatException>(() => XmlTasks.CombineXML(_input, new CancellationToken()));
+
+        }
+
         [Test]
         public void TestMinifiedXML_even()
         {
@@ -70,7 +146,6 @@ namespace Frends.Split.Tests
             //The Last Product of second file should have id 8
             var id2nd = ExecuteXpath(result.FilePaths[1], "string(/root/Product[last()]/id)");
             Assert.AreEqual("8", id2nd);
-
         }
 
         [Test]
