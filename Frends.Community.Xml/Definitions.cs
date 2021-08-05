@@ -6,6 +6,36 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Community.Xml
 {
+    public class CombineXMLInput
+    {
+        /// <summary>
+        /// Array of xmls with child element names
+        /// </summary>
+        public CombineXMLInputXml[] InputXmls { set; get; }
+
+        /// <summary>
+        ///  Name for root element
+        /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
+        [DefaultValue("\"Root\"")]
+        public string XmlRootElementName { set; get; }
+    }
+
+    public class CombineXMLInputXml
+    {
+        /// <summary>
+        /// Xml input as string or xml document
+        /// </summary>
+        public object Xml { set; get; }
+
+        /// <summary>
+        /// Child element name where the xml document will be written in
+        /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
+        [DefaultValue("\"ChildElement\"")]
+        public string ChildElementName { set; get; }
+    }
+
     public class SplitXMLFileInput
     {
         /// <summary>
