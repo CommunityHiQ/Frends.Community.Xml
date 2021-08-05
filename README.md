@@ -29,7 +29,7 @@ Combines two or more xml strings or xml documents to one xml string
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| InputXmls | InputXml[] | Xml strings or xml documents that will be merged | n/a |
+| InputXmls | ``array[InputXml]`` | Xml strings or xml documents that will be merged | n/a |
 | XmlRootElementName| ``string`` | Root element of xml | `Root` |
 
 #### InputXml
