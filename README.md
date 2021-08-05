@@ -6,6 +6,7 @@ Frends Community Task library for XML operations
 
 - [Installing](#installing)
 - [Tasks](#tasks)
+     - [CombineXML](#combineXML)
      - [SplitXMLFile](#SplitXMLFile)
 - [Building](#building)
 - [Contributing](#contributing)
@@ -17,6 +18,32 @@ You can install the Task via frends UI Task View or you can find the NuGet packa
 https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view in MyGet https://www.myget.org/feed/frends-community/package/nuget/Frends.Community.Xml
 
 # Tasks
+
+## CombineXML
+Combines two or more xml strings or xml documents to one xml string
+
+### Properties
+
+#### Input
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| InputXmls | InputXml[] | Xml strings or xml documents that will be merged | n/a |
+| XmlRootElementName| string | Root element of xml| 'Root' |
+
+#### InputXml
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| Xml| object | Xml input as string or xml document | `<note><body>Hello!</body></note> `|
+| ChildElementName| string | Child element name where the xml document will be written in| 'ChildElement1' |
+
+
+### Returns
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| Xml| string| Combined xml as string | ``<root><child1><note1><body1>Hello!</body1></note1></child1><child2><note2<body2>Hello2!</body2></note2></child2></root>``
 
 ## SplitXMLFile
 
@@ -75,7 +102,7 @@ Example output files when value of ElementCountInEachFile is 2:
 | ElementCountInEachFile | `int` | Maximum number of chosen elements to be written in each file. | `5000` |
 | OutputFileRootNodeName | `string` | Root element of output file. | `Root` |
 
-### Returns SplitXMLFileResult
+### Returns
 
 A result object with parameters.
 
@@ -117,3 +144,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | Version | Changes |
 | ------- | ------- |
 | 1.0.0   | First version. Includes task SplitXMLFile |
+| 2.0.0   | CombineXML task included. |
