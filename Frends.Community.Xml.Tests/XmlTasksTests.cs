@@ -224,8 +224,8 @@ namespace Frends.Community.Xml.Tests
                 new ColumnLength { Length = 4 }
             };
 
-            var options = new ConvertToXMLInput { Input = "asd123as1234asdf" };
-            var csvOptions = new ConvertCSVtoXMLParameters { CSVSeparator = null, ColumnLengths = columns, InputHasHeaderRow = false, TrimOuputColumns = false };
+            var options = new Parameters { Input = "asd123as1234asdf" };
+            var csvOptions = new CsvInputParameters { CSVSeparator = null, ColumnLengths = columns, InputHasHeaderRow = false, TrimOuputColumns = false };
             var result = XmlTasks.ConvertToXML(options, csvOptions, null, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<NewDataSet><Table1><Column1>asd</Column1>"));
         }
@@ -233,8 +233,8 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestConvertToXMLUsingSeparatorAndTrim()
         {
-            var options = new ConvertToXMLInput { Input = "asd ;as;asdf" };
-            var csvOptions = new ConvertCSVtoXMLParameters
+            var options = new Parameters { Input = "asd ;as;asdf" };
+            var csvOptions = new CsvInputParameters
             {
                 CSVSeparator = ";",
                 ColumnLengths = null,
@@ -248,8 +248,8 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestConvertToXMLUsingJSON()
         {
-            var options = new ConvertToXMLInput { Input = "{\"field1\":\"value1\", \"field2\":\"value2\"}" };
-            var jsonInputParameters = new ConvertJsonToXMLParameters { XMLRootElementName = "test" };
+            var options = new Parameters { Input = "{\"field1\":\"value1\", \"field2\":\"value2\"}" };
+            var jsonInputParameters = new JsonInputParameters { XMLRootElementName = "test" };
             var result = XmlTasks.ConvertToXML(options, null, jsonInputParameters, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<test><field1>value1</field1>"));
         }
@@ -257,8 +257,8 @@ namespace Frends.Community.Xml.Tests
         public void TestConvertToXMLWithNumericKeys()
         {
 
-            var options = new ConvertToXMLInput { Input = "{\"48\":\"value1\", \"2\":\"value2\"}" };
-            var jsonInputParameters = new ConvertJsonToXMLParameters { XMLRootElementName = "test", AppendToFieldName = "foo" };
+            var options = new Parameters { Input = "{\"48\":\"value1\", \"2\":\"value2\"}" };
+            var jsonInputParameters = new JsonInputParameters { XMLRootElementName = "test", AppendToFieldName = "foo" };
             var result = XmlTasks.ConvertToXML(options, null, jsonInputParameters, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<test><foo48>value1</foo48>"));
         }
@@ -266,8 +266,8 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestConvertToXMLWithNumericKeysWithoutAppend()
         {
-            var options = new ConvertToXMLInput { Input = "{\"1\":\"value1\", \"2\":\"value2\"}" };
-            var jsonInputParameters = new ConvertJsonToXMLParameters { XMLRootElementName = "test", AppendToFieldName = null };
+            var options = new Parameters { Input = "{\"1\":\"value1\", \"2\":\"value2\"}" };
+            var jsonInputParameters = new JsonInputParameters { XMLRootElementName = "test", AppendToFieldName = null };
 
             var result = XmlTasks.ConvertToXML(options, null, jsonInputParameters, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<test><_x0031_>value1</_x0031_>"));

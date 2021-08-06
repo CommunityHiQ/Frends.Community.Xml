@@ -44,7 +44,7 @@ namespace Frends.Community.Xml
         public int Length { set; get; }
     }
 
-    public class ConvertJsonToXMLParameters
+    public class JsonInputParameters
     {
         /// <summary>
         /// XML root element name
@@ -57,7 +57,7 @@ namespace Frends.Community.Xml
         public string AppendToFieldName { get; set; }
     }
 
-    public class ConvertCSVtoXMLParameters
+    public class CsvInputParameters
     {
         /// <summary>
         /// CSV separator
@@ -79,7 +79,7 @@ namespace Frends.Community.Xml
         /// </summary>
         public bool TrimOuputColumns { get; set; }
     }
-    public class ConvertToXMLInput
+    public class Parameters
     {
         /// <summary>
         /// Input data. Supported formats JSON, CSV and fixed length
