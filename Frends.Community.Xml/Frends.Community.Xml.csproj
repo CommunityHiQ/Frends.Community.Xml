@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>netstandard2.0;net471</TargetFrameworks>
+	  <TargetFrameworks>netstandard2.0;net471</TargetFrameworks>
     <authors>HiQ Finland</authors>
     <copyright>HiQ Finland</copyright>
+    <Description>A collection of XML related tasks.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/CommunityHiQ/Frends.Community.Xml</PackageProjectUrl>
     <IncludeSource>true</IncludeSource>
