@@ -6,30 +6,30 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Community.Xml
 {
-    public class CombineXMLInput
+    public class CombineXmlInput
     {
         /// <summary>
-        /// Array of xmls with child element names
+        /// An array of XMLs with child element names
         /// </summary>
-        public CombineXMLInputXml[] InputXmls { set; get; }
+        public CombineXmlInputXml[] InputXmls { set; get; }
 
         /// <summary>
-        ///  Name for root element
+        /// The name of the root element
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue("\"Root\"")]
         public string XmlRootElementName { set; get; }
     }
 
-    public class CombineXMLInputXml
+    public class CombineXmlInputXml
     {
         /// <summary>
-        /// Xml input as string or xml document
+        /// XML input as string or an XML document
         /// </summary>
         public object Xml { set; get; }
 
         /// <summary>
-        /// Child element name where the xml document will be written in
+        /// Child element name where the XML document will be written in
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue("\"ChildElement\"")]
@@ -44,23 +44,23 @@ namespace Frends.Community.Xml
         public int Length { set; get; }
     }
 
-    public class JsonInputParameters
+    public class ConvertToXmlJsonInputParameters
     {
         /// <summary>
-        /// XML root element name
+        /// The name of the root element on the XML
         /// </summary>
         public string XMLRootElementName { get; set; }
 
         /// <summary>
-        /// Json change numeric keys
+        /// Append numeric JSON fields with prefix
         /// </summary>
         public string AppendToFieldName { get; set; }
     }
 
-    public class CsvInputParameters
+    public class ConvertToXmlCsvInputParameters
     {
         /// <summary>
-        /// CSV separator
+        /// Separator used in the CSV
         /// </summary>
         public string CSVSeparator { get; set; }
 
@@ -70,16 +70,16 @@ namespace Frends.Community.Xml
         public ColumnLength[] ColumnLengths { get; set; }
 
         /// <summary>
-        /// Input has header row
+        /// Input CSV has a header row
         /// </summary>
         public bool InputHasHeaderRow { get; set; }
 
         /// <summary>
-        /// Trim ouput columns
+        /// Trim output columns
         /// </summary>
         public bool TrimOuputColumns { get; set; }
     }
-    public class Parameters
+    public class ConvertToXmlParameters
     {
         /// <summary>
         /// Input data. Supported formats JSON, CSV and fixed length
@@ -87,7 +87,7 @@ namespace Frends.Community.Xml
         public string Input { get; set; }
     }
 
-    public class ConvertToXMLOutput
+    public class ConvertToXmlOutput
     {
         /// <summary>
         /// Result string
@@ -95,10 +95,39 @@ namespace Frends.Community.Xml
         public string Result { get; set; }
     }
 
-    public class SplitXMLFileInput
+    public class ConvertXmlToCsvInput
     {
         /// <summary>
-        /// Path of input file
+        /// XML string to be converted into csv
+        /// </summary>
+        [DisplayName("Input XML as string")]
+        public string InputXmlString { get; set; }
+
+        /// <summary>
+        /// Separator for the output columns.
+        /// </summary>
+        [DefaultValue("\",\"")]
+        public string CsvSeparator { get; set; }
+
+        /// <summary>
+        /// True if the column headers should be included in the output.
+        /// </summary>
+        [DefaultValue(true)]
+        public bool IncludeHeaders { get; set; }
+    }
+
+    public class ConvertXmlToCsvOutput
+    {
+        /// <summary>
+        /// Result csv
+        /// </summary>
+        public string Result { get; set; }
+    }
+
+    public class SplitXmlFileInput
+    {
+        /// <summary>
+        /// Path to the input file
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue(@"F:\myfile.xml")]
@@ -119,7 +148,7 @@ namespace Frends.Community.Xml
         public string OutputFilesDirectory { get; set; }
     }
 
-    public class SplitXMLFileOptions
+    public class SplitXmlFileOptions
     {
         /// <summary>
         /// Maximum number of chosen elements to be written in each file
@@ -128,17 +157,17 @@ namespace Frends.Community.Xml
         public int ElementCountInEachFile { get; set; }
 
         /// <summary>
-        /// Root element of output file
+        /// The name of the root element for the output file
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue("Root")]
         public string OutputFileRootNodeName { get; set; }
     }
 
-    public class SplitXMLFileResult
+    public class SplitXmlFileResult
     {
         /// <summary>
-        /// List of new files
+        /// List of filepaths to the new files
         /// </summary>
         public List<string> FilePaths;
     }

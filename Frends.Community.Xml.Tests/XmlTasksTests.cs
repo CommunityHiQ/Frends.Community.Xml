@@ -46,10 +46,10 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestMinifiedXML_even()
         {
-            var input = new SplitXMLFileInput() { InputFilePath = _minifiedInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
-            var opt = new SplitXMLFileOptions() {ElementCountInEachFile = 4, OutputFileRootNodeName = "root"};
+            var input = new SplitXmlFileInput() { InputFilePath = _minifiedInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
+            var opt = new SplitXmlFileOptions() {ElementCountInEachFile = 4, OutputFileRootNodeName = "root"};
 
-            var result = XmlTasks.SplitXMLFile(input, opt, new CancellationToken());
+            var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
             //12 products should be split into 3 files
             Assert.AreEqual(3, result.FilePaths.Count);
@@ -74,10 +74,10 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestPrettyXML_uneven()
         {
-            var input = new SplitXMLFileInput() { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
-            var opt = new SplitXMLFileOptions() { ElementCountInEachFile = 10, OutputFileRootNodeName = "root" };
+            var input = new SplitXmlFileInput() { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
+            var opt = new SplitXmlFileOptions() { ElementCountInEachFile = 10, OutputFileRootNodeName = "root" };
 
-            var result = XmlTasks.SplitXMLFile(input, opt, new CancellationToken());
+            var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
             //12 products should be split into 2 files
             Assert.AreEqual(2, result.FilePaths.Count);
@@ -96,10 +96,10 @@ namespace Frends.Community.Xml.Tests
         {
             string expectedRootElement = "TestRoot";
 
-            var input = new SplitXMLFileInput() { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
-            var opt = new SplitXMLFileOptions() { ElementCountInEachFile = 20, OutputFileRootNodeName = expectedRootElement };
+            var input = new SplitXmlFileInput() { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
+            var opt = new SplitXmlFileOptions() { ElementCountInEachFile = 20, OutputFileRootNodeName = expectedRootElement };
 
-            var result = XmlTasks.SplitXMLFile(input, opt, new CancellationToken());
+            var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
             //Check root element
             var rootElementName = ExecuteXpath(result.FilePaths.Last(), "local-name(/*)");
@@ -119,8 +119,8 @@ namespace Frends.Community.Xml.Tests
         private XmlDocument _xmlDoc1 = new XmlDocument();
         private XmlDocument _xmlDoc2 = new XmlDocument();
 
-        private CombineXMLInput _input;
-        private CombineXMLInputXml[] _inputXmls = new CombineXMLInputXml[2];
+        private CombineXmlInput _input;
+        private CombineXmlInputXml[] _inputXmls = new CombineXmlInputXml[2];
 
         [SetUp]
         public void TestSetup()
@@ -131,10 +131,10 @@ namespace Frends.Community.Xml.Tests
             _xmlDoc1.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><foo1>bar1</foo1>");
             _xmlDoc2.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><foo2>bar2</foo2>");
 
-            _inputXmls[0] = new CombineXMLInputXml { ChildElementName = "XML1" };
-            _inputXmls[1] = new CombineXMLInputXml { ChildElementName = "XML2" };
+            _inputXmls[0] = new CombineXmlInputXml { ChildElementName = "XML1" };
+            _inputXmls[1] = new CombineXmlInputXml { ChildElementName = "XML2" };
 
-            _input = new CombineXMLInput { InputXmls = _inputXmls, XmlRootElementName = "Root" };
+            _input = new CombineXmlInput { InputXmls = _inputXmls, XmlRootElementName = "Root" };
         }
 
         [TearDown]
@@ -148,7 +148,7 @@ namespace Frends.Community.Xml.Tests
             _inputXmls[0].Xml = _xmlString1;
             _inputXmls[1].Xml = _xmlString2;
 
-            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            var result = await XmlTasks.CombineXml(_input, new CancellationToken());
             Assert.That(result, Is.EqualTo("<Root><XML1><bar1>foo1</bar1></XML1><XML2><bar2>foo2</bar2></XML2></Root>"));
         }
 
@@ -158,7 +158,7 @@ namespace Frends.Community.Xml.Tests
             _inputXmls[0].Xml = _xmlDoc1;
             _inputXmls[1].Xml = _xmlDoc2;
 
-            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            var result = await XmlTasks.CombineXml(_input, new CancellationToken());
             Assert.That(result, Is.EqualTo("<Root><XML1><foo1>bar1</foo1></XML1><XML2><foo2>bar2</foo2></XML2></Root>"));
         }
 
@@ -168,7 +168,7 @@ namespace Frends.Community.Xml.Tests
             _inputXmls[0].Xml = _xmlString1;
             _inputXmls[1].Xml = _xmlDoc1;
 
-            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            var result = await XmlTasks.CombineXml(_input, new CancellationToken());
             Assert.That(result, Is.EqualTo("<Root><XML1><bar1>foo1</bar1></XML1><XML2><foo1>bar1</foo1></XML2></Root>"));
         }
 
@@ -181,7 +181,7 @@ namespace Frends.Community.Xml.Tests
             _inputXmls[1].ChildElementName = "NEW_ELEMENT2";
             _input.XmlRootElementName = "NEW_ROOT";
 
-            var result = await XmlTasks.CombineXML(_input, new CancellationToken());
+            var result = await XmlTasks.CombineXml(_input, new CancellationToken());
             Assert.That(result, Is.EqualTo("<NEW_ROOT><NEW_ELEMENT1><bar1>foo1</bar1></NEW_ELEMENT1><NEW_ELEMENT2><bar2>foo2</bar2></NEW_ELEMENT2></NEW_ROOT>"));
         }
 
@@ -190,11 +190,11 @@ namespace Frends.Community.Xml.Tests
         {
             _inputXmls[0].Xml = _xmlString1;
             _inputXmls[1].Xml = 123456;
-            Assert.ThrowsAsync<FormatException>(() => XmlTasks.CombineXML(_input, new CancellationToken()));
+            Assert.ThrowsAsync<FormatException>(() => XmlTasks.CombineXml(_input, new CancellationToken()));
 
             _inputXmls[0].Xml = new object();
             _inputXmls[1].Xml = _xmlDoc2;
-            Assert.ThrowsAsync<FormatException>(() => XmlTasks.CombineXML(_input, new CancellationToken()));
+            Assert.ThrowsAsync<FormatException>(() => XmlTasks.CombineXml(_input, new CancellationToken()));
 
         }
     }
@@ -224,52 +224,52 @@ namespace Frends.Community.Xml.Tests
                 new ColumnLength { Length = 4 }
             };
 
-            var options = new Parameters { Input = "asd123as1234asdf" };
-            var csvOptions = new CsvInputParameters { CSVSeparator = null, ColumnLengths = columns, InputHasHeaderRow = false, TrimOuputColumns = false };
-            var result = XmlTasks.ConvertToXML(options, csvOptions, null, new CancellationToken());
+            var options = new ConvertToXmlParameters { Input = "asd123as1234asdf" };
+            var csvOptions = new ConvertToXmlCsvInputParameters { CSVSeparator = null, ColumnLengths = columns, InputHasHeaderRow = false, TrimOuputColumns = false };
+            var result = XmlTasks.ConvertToXml(options, csvOptions, null, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<NewDataSet><Table1><Column1>asd</Column1>"));
         }
 
         [Test]
         public void TestConvertToXMLUsingSeparatorAndTrim()
         {
-            var options = new Parameters { Input = "asd ;as;asdf" };
-            var csvOptions = new CsvInputParameters
+            var options = new ConvertToXmlParameters { Input = "asd ;as;asdf" };
+            var csvOptions = new ConvertToXmlCsvInputParameters
             {
                 CSVSeparator = ";",
                 ColumnLengths = null,
                 InputHasHeaderRow = false,
                 TrimOuputColumns = true
             };
-            var result = XmlTasks.ConvertToXML(options, csvOptions, null, new CancellationToken());
+            var result = XmlTasks.ConvertToXml(options, csvOptions, null, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<NewDataSet><Table1><Column1>asd</Column1>"));
         }
 
         [Test]
         public void TestConvertToXMLUsingJSON()
         {
-            var options = new Parameters { Input = "{\"field1\":\"value1\", \"field2\":\"value2\"}" };
-            var jsonInputParameters = new JsonInputParameters { XMLRootElementName = "test" };
-            var result = XmlTasks.ConvertToXML(options, null, jsonInputParameters, new CancellationToken());
+            var options = new ConvertToXmlParameters { Input = "{\"field1\":\"value1\", \"field2\":\"value2\"}" };
+            var jsonInputParameters = new ConvertToXmlJsonInputParameters { XMLRootElementName = "test" };
+            var result = XmlTasks.ConvertToXml(options, null, jsonInputParameters, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<test><field1>value1</field1>"));
         }
         [Test]
         public void TestConvertToXMLWithNumericKeys()
         {
 
-            var options = new Parameters { Input = "{\"48\":\"value1\", \"2\":\"value2\"}" };
-            var jsonInputParameters = new JsonInputParameters { XMLRootElementName = "test", AppendToFieldName = "foo" };
-            var result = XmlTasks.ConvertToXML(options, null, jsonInputParameters, new CancellationToken());
+            var options = new ConvertToXmlParameters { Input = "{\"48\":\"value1\", \"2\":\"value2\"}" };
+            var jsonInputParameters = new ConvertToXmlJsonInputParameters { XMLRootElementName = "test", AppendToFieldName = "foo" };
+            var result = XmlTasks.ConvertToXml(options, null, jsonInputParameters, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<test><foo48>value1</foo48>"));
         }
 
         [Test]
         public void TestConvertToXMLWithNumericKeysWithoutAppend()
         {
-            var options = new Parameters { Input = "{\"1\":\"value1\", \"2\":\"value2\"}" };
-            var jsonInputParameters = new JsonInputParameters { XMLRootElementName = "test", AppendToFieldName = null };
+            var options = new ConvertToXmlParameters { Input = "{\"1\":\"value1\", \"2\":\"value2\"}" };
+            var jsonInputParameters = new ConvertToXmlJsonInputParameters { XMLRootElementName = "test", AppendToFieldName = null };
 
-            var result = XmlTasks.ConvertToXML(options, null, jsonInputParameters, new CancellationToken());
+            var result = XmlTasks.ConvertToXml(options, null, jsonInputParameters, new CancellationToken());
             Assert.IsTrue(result.Result.StartsWith("<test><_x0031_>value1</_x0031_>"));
 
         }

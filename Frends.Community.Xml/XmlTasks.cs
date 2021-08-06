@@ -4,8 +4,10 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -19,9 +21,10 @@ namespace Frends.Community.Xml
         /// <summary>
         /// Combines 2 or more xml strings or documents to 1 xml string
         /// </summary>
-        /// <param name="input">Xml strings or xml documents that will be merged</param>
+        /// <param name="input">XML strings or XML documents that will be merged</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>string</returns>
-        public static async Task<string> CombineXML(CombineXMLInput input, CancellationToken cancellationToken)
+        public static async Task<string> CombineXml([PropertyTab] CombineXmlInput input, CancellationToken cancellationToken)
         {
             var inputXmls = input.InputXmls;
 
@@ -81,8 +84,9 @@ namespace Frends.Community.Xml
         /// <param name="parameters">JSON or CSV string to be converted.</param>
         /// <param name="csvInputParameters">Parameters for conversion from CSV to XML.</param>
         /// <param name="jsonInputParameters">Parameters for conversion from JSON to XML.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>Object { string Result }</returns>
-        public static ConvertToXMLOutput ConvertToXML(Parameters parameters, [PropertyTab] CsvInputParameters csvInputParameters, [PropertyTab] JsonInputParameters jsonInputParameters, CancellationToken cancellationToken)
+        public static ConvertToXmlOutput ConvertToXml(ConvertToXmlParameters parameters, [PropertyTab] ConvertToXmlCsvInputParameters csvInputParameters, [PropertyTab] ConvertToXmlJsonInputParameters jsonInputParameters, CancellationToken cancellationToken)
         {
             if (parameters.Input.GetType() != typeof(string))
                 throw new InvalidDataException("The input data string was not in correct format. Supported formats are JSON, CSV and fixed length.");
@@ -93,13 +97,13 @@ namespace Frends.Community.Xml
                     throw new MissingFieldException("Root element name missing. Required with JSON input");
 
                 if (jsonInputParameters.AppendToFieldName == null)
-                    return new ConvertToXMLOutput { Result = JsonConvert.DeserializeXmlNode(parameters.Input, jsonInputParameters.XMLRootElementName).OuterXml };
+                    return new ConvertToXmlOutput { Result = JsonConvert.DeserializeXmlNode(parameters.Input, jsonInputParameters.XMLRootElementName).OuterXml };
 
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var jsonObject = (JObject) JsonConvert.DeserializeObject(parameters.Input);
                 var newObject = ChangeNumericKeys(jsonObject, jsonInputParameters.AppendToFieldName);
-                return new ConvertToXMLOutput { Result = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(newObject), jsonInputParameters.XMLRootElementName).OuterXml };
+                return new ConvertToXmlOutput { Result = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(newObject), jsonInputParameters.XMLRootElementName).OuterXml };
             }
 
             if (!string.IsNullOrEmpty(csvInputParameters.CSVSeparator) && parameters.Input.Contains(csvInputParameters.CSVSeparator))
@@ -114,7 +118,7 @@ namespace Frends.Community.Xml
                     parser.FirstRowHasHeader = csvInputParameters.InputHasHeaderRow;
                     parser.MaxBufferSize = 4096;
                     parser.TrimResults = csvInputParameters.TrimOuputColumns;
-                    return new ConvertToXMLOutput { Result = parser.GetXml().OuterXml };
+                    return new ConvertToXmlOutput { Result = parser.GetXml().OuterXml };
                 }
             }
 
@@ -137,8 +141,23 @@ namespace Frends.Community.Xml
                 parser.FirstRowHasHeader = csvInputParameters.InputHasHeaderRow;
                 parser.MaxBufferSize = 4096;
                 parser.TrimResults = csvInputParameters.TrimOuputColumns;
-                return new ConvertToXMLOutput { Result = parser.GetXml().OuterXml };
+                return new ConvertToXmlOutput { Result = parser.GetXml().OuterXml };
             }
+        }
+
+        /// <summary>
+        /// Convert xml or json data into the csv formated data. Errors are always thrown by an exception. See: https://github.com/CommunityHiQ/Frends.Community.ConvertToCsv
+        /// </summary>
+        /// <param name="input">Input XML</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Object {string Result }</returns>
+        public static ConvertXmlToCsvOutput ConvertXmlToCsv([PropertyTab] ConvertXmlToCsvInput input, CancellationToken cancellationToken)
+        {
+            DataSet dataset;
+            dataset = new DataSet();
+            dataset.ReadXml(XmlReader.Create(new StringReader(input.InputXmlString)));
+
+            return new ConvertXmlToCsvOutput { Result = ConvertDataTableToCsv(dataset.Tables[0], input.CsvSeparator, input.IncludeHeaders, cancellationToken) };
         }
 
         /// <summary>
@@ -146,8 +165,9 @@ namespace Frends.Community.Xml
         /// </summary>
         /// <param name="Input">Input XML to be split.</param>
         /// <param name="Options">Configuration for splitting the XML.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>Object { List&lt;string&gt; FilePaths } </returns>
-        public static SplitXMLFileResult SplitXMLFile([PropertyTab]SplitXMLFileInput Input, [PropertyTab]SplitXMLFileOptions Options, CancellationToken cancellationToken)
+        public static SplitXmlFileResult SplitXmlFile([PropertyTab] SplitXmlFileInput Input, [PropertyTab] SplitXmlFileOptions Options, CancellationToken cancellationToken)
         {
             int seqNr = 0;
             int loopSeqNr = 0;
@@ -194,7 +214,7 @@ namespace Frends.Community.Xml
                 }
             }
 
-            return new SplitXMLFileResult() { FilePaths = returnArray };
+            return new SplitXmlFileResult() { FilePaths = returnArray };
         }
 
         private static XmlDocument InitiateNewDocument(string Rootname)
@@ -253,6 +273,27 @@ namespace Frends.Community.Xml
             }
 
             return newO;
+        }
+
+        private static string ConvertDataTableToCsv(DataTable datatable, string separator, bool includeHeaders, CancellationToken cancellationToken)
+        {
+            var stringBuilder = new StringBuilder();
+
+            if (includeHeaders)
+            {
+                var columnNames = datatable.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
+                stringBuilder.AppendLine(string.Join(separator, columnNames));
+            }
+
+            foreach (DataRow row in datatable.Rows)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var fields = row.ItemArray.Select(field => field.ToString());
+                fields = fields.Select(x => (x.Contains(separator) || x.Contains("\n") || x.Contains("\"")) ? "\"" + x.Replace("\"", "\"\"") + "\"" : x); // Fixes cases where input field contains special characters
+                stringBuilder.AppendLine(string.Join(separator, fields));
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }
