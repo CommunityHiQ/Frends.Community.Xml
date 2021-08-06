@@ -124,6 +124,170 @@ namespace Frends.Community.Xml
         public string Result { get; set; }
     }
 
+    public class SignXmlInput
+    {
+        public XmlParamType XmlInputType { get; set; }
+
+        /// <summary>
+        /// Path to xml document to sign
+        /// </summary>
+        [DefaultValue("c:\\temp\\document.xml")]
+        [DisplayFormat(DataFormatString = "Text")]
+        [UIHint(nameof(XmlInputType), "", XmlParamType.File)]
+        public string XmlFilePath { get; set; }
+
+        /// <summary>
+        /// XML to sign
+        /// </summary>
+        [DefaultValue("<root><value>123</value></root>")]
+        [DisplayFormat(DataFormatString = "Xml")]
+        [UIHint(nameof(XmlInputType), "", XmlParamType.XmlString)]
+        public string Xml { get; set; }
+
+        /// <summary>
+        /// XML signing technique to use
+        /// </summary>
+        public XmlEnvelopingType XmlEnvelopingType { get; set; }
+
+        /// <summary>
+        /// How to sign the document
+        /// </summary>
+        public SigningStrategyType SigningStrategy { get; set; }
+
+        /// <summary>
+        /// Path to certificate with private key
+        /// </summary>
+        [DefaultValue("c:\\certificates\\signingcertificate.pfx")]
+        [DisplayFormat(DataFormatString = "Text")]
+        [UIHint(nameof(SigningStrategy), "", SigningStrategyType.PrivateKeyCertificate)]
+        public string CertificatePath { get; set; }
+
+        /// <summary>
+        /// Private key password
+        /// </summary>
+        [PasswordPropertyText]
+        [UIHint(nameof(SigningStrategy), "", SigningStrategyType.PrivateKeyCertificate)]
+        public string PrivateKeyPassword { get; set; }
+    }
+
+    public class SignXmlOutput
+    {
+        /// <summary>
+        /// Output to file or xml string?
+        /// </summary>
+        public XmlParamType OutputType { get; set; }
+
+        /// <summary>
+        /// A filepath for the output XML
+        /// </summary>
+        [DefaultValue("c:\\temp\\signedOutput.xml")]
+        [DisplayFormat(DataFormatString = "Text")]
+        [UIHint(nameof(OutputType), "", XmlParamType.File)]
+        public string OutputFilePath { get; set; }
+
+        /// <summary>
+        /// The encoding for the output file
+        /// </summary>
+        [DefaultValue("UTF-8")]
+        [DisplayFormat(DataFormatString = "Text")]
+        [UIHint(nameof(OutputType), "", XmlParamType.File)]
+        public string OutputEncoding { get; set; }
+
+        /// <summary>
+        /// If source is file, then you can add signature to it
+        /// </summary>
+        [UIHint(nameof(OutputType), "", XmlParamType.File)]
+        public bool AddSignatureToSourceFile { get; set; }
+    }
+
+    public class SignXmlOptions
+    {
+        public bool IncludeComments { get; set; }
+
+        /// <summary>
+        /// Should whitespace be preserved when loading the XML?
+        /// </summary>
+        public bool PreserveWhitespace { get; set; }
+
+        /// <summary>
+        /// Signature methods to be used with signing
+        /// </summary>
+        public XmlSignatureMethod XmlSignatureMethod { get; set; }
+
+        /// <summary>
+        /// Digest methods to be used
+        /// </summary>
+        public DigestMethod DigestMethod { get; set; }
+
+        /// <summary>
+        /// Transform methods to be used
+        /// </summary>
+        public TransformMethod[] TransformMethods { get; set; }
+    }
+
+    public class SigningResult
+    {
+        /// <summary>
+        /// If output type is file, this will be a filepath. Otherwise, this will be the signed XML as string.
+        /// </summary>
+        public string Result { get; set; }
+    }
+
+    /// <summary>
+    /// Can be either a file or an XML string
+    /// </summary>
+    public enum XmlParamType
+    {
+        File,
+        XmlString
+    }
+
+    public enum SigningStrategyType
+    {
+        PrivateKeyCertificate
+    }
+
+    public enum XmlEnvelopingType
+    {
+        XmlEnvelopedSignature
+        //XmlEnvelopingSignature // not supported
+        //XmlDetachedSignature // not supported
+    }
+
+    /// <summary>
+    /// Signature methods for XMLDSIG
+    /// </summary>
+    public enum XmlSignatureMethod
+    {
+        RSASHA1,
+        RSASHA256,
+        RSASHA384,
+        RSASHA512
+    }
+
+    /// <summary>
+    /// Transform methods
+    /// </summary>
+    public enum TransformMethod
+    {
+        DsigC14,
+        DsigC14WithComments,
+        DsigExcC14,
+        DsigExcC14WithComments,
+        DsigBase64
+    }
+
+    /// <summary>
+    /// Digest methods
+    /// </summary>
+    public enum DigestMethod
+    {
+        SHA1,
+        SHA256,
+        SHA384,
+        SHA512
+    }
+
     public class SplitXmlFileInput
     {
         /// <summary>
@@ -170,5 +334,44 @@ namespace Frends.Community.Xml
         /// List of filepaths to the new files
         /// </summary>
         public List<string> FilePaths;
+    }
+
+    public class VerifySignatureInput
+    {
+        /// <summary>
+        /// Either an XML string or a filepath
+        /// </summary>
+        public XmlParamType XmlInputType { get; set; }
+
+        /// <summary>
+        /// Path to the XML document
+        /// </summary>
+        [DefaultValue("c:\\temp\\documentToVerify.xml")]
+        [DisplayFormat(DataFormatString = "Text")]
+        [UIHint(nameof(XmlInputType), "", XmlParamType.File)]
+        public string XmlFilePath { get; set; }
+
+        /// <summary>
+        /// XML in string format
+        /// </summary>
+        [DisplayFormat(DataFormatString = "Xml")]
+        [UIHint(nameof(XmlInputType), "", XmlParamType.XmlString)]
+        public string Xml { get; set; }
+    }
+
+    public class VerifySignatureOptions
+    {
+        /// <summary>
+        /// Should whitespace be preserved when loading the XML?
+        /// </summary>
+        public bool PreserveWhitespace { get; set; }
+    }
+
+    public class VerifySignatureResult
+    {
+        /// <summary>
+        /// True, if valid. Otherwise, false.
+        /// </summary>
+        public bool IsValid { get; set; }
     }
 }
