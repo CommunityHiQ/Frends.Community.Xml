@@ -8,6 +8,7 @@ Frends Community Task library for XML operations
 - [Tasks](#tasks)
      - [CombineXML](#CombineXML)
      - [ConvertToXML](#ConvertToXML)
+     - [ConvertXmlToCsv](#ConvertXmlToCsv)
      - [SplitXMLFile](#SplitXMLFile)
 - [Building](#building)
 - [Contributing](#contributing)
