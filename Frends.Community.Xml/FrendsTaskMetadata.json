@@ -10,7 +10,13 @@
 			"TaskMethod": "Frends.Community.Xml.XmlTasks.ConvertXmlToCsv"
 		},
 		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.SignXml"
+		},
+		{
 			"TaskMethod": "Frends.Community.Xml.XmlTasks.SplitXmlFile"
+		},
+		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.VerifySignedXml"
 		}
 	]
 }

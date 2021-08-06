@@ -9,7 +9,9 @@ Frends Community Task library for XML operations
      - [CombineXML](#CombineXML)
      - [ConvertToXML](#ConvertToXML)
      - [ConvertXmlToCsv](#ConvertXmlToCsv)
+     - [SignXml](#SignXml)
      - [SplitXMLFile](#SplitXMLFile)
+     - [VerifySignedXml](#VerifySignedXml)
 - [Building](#building)
 - [Contributing](#contributing)
 - [Change Log](#change-log)
@@ -22,7 +24,7 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 # Tasks
 
 ## CombineXml
-Combines two or more xml strings or xml documents to one xml string
+Combines multiple XML strings or XML documents into a single XML string.
 
 ### Properties
 
@@ -57,6 +59,8 @@ Combines two or more xml strings or xml documents to one xml string
 
 ## ConvertToXml
 
+Task parses input data into XML data. Supported input formats JSON, CSV and fixed-length.
+
 ### Parameters
 
 | Property				|  Type   | Description								| Example                     |
@@ -86,6 +90,8 @@ Combines two or more xml strings or xml documents to one xml string
 | Result        | ``string`` | Result as XML	| `<NewDataSet><Table1><Column1>first</Column1><Column2>second</Column2><Column3>third</Column3></Table1></NewDataSet>` |
 
 ## ConvertXmlToCsv
+
+Convert XML or JSON data into CSV formatted data.
 
 ### Input
 
@@ -157,6 +163,46 @@ foo_Id,foobar
 1,5
 ```
 
+### SignXml
+
+Signs a XML document (XMLDSIG). Takes XML input either as a file or as a XML-string and outputs a signed version of it.
+
+#### Input
+| Property  | Type  | Description |Example|
+|-----------|-------|-------------|-------|
+| XmlInputType  | `XmlParamType` | Choose input type | Possible values: `File`, `XML-string` |
+| XmlFilePath  | `string` | Path of the XML file to be signed. | `c:\temp\document.xml` |
+| Xml  | `string` | File as XML-string | `XML-string` |
+| XmlEnvelopingType  | `XmlEnvelopingType` | Choose the type of enveloping | Possible values: `XmlEnvelopedSignature` |
+| SigningStrategyType  | `SigningStrategyType` | Choose the type of signing | Possible values: `PrivateKeyCertificate` |
+| CertificatePath  | `string` | Path for certificate file | `c:\certificates\signingcertificate.pfx` |
+| PrivateKeyPassword  | `string` | Password used for certificate file |  |
+
+#### Output
+
+| Property  | Type  | Description |Example|
+|-----------|-------|-------------|-------|
+| OutputType  | `XMLParamType` | Output format | Possible values: `File` or `XML-string` |
+| OutputFilePath  | `string` | Path for the signed XML file | `c:\temp\signedOutput.xml` |
+| OutputEncoding  | `string` | Encoding for output file | `UTF-8` |
+| AddSignatureToSourceFile  | `boolean` | If true, add signature to original input file | `true` |
+
+#### Options
+
+| Property  | Type  | Description |Example|
+|-----------|-------|-------------|-------|
+| IncludeComments  | `boolean` | If true, add additional transform methods | `true` |
+| PreserveWhitespace  | `boolean` | Preserve whitespace when loading XML? | `true` |
+| XmlSignatureMethod  | `XmlSignatureMethod` | Method for XML signature | Possible values: `RSASHA1`, `RSASHA256`, `RSASHA384`, `RSASHA512` |
+| DigestMethod  | `DigestMethod` | Digest method to use | Possible values: `SHA1`, `SHA256`, `SHA384`, `SHA512` |
+| TransformMethods  | `TransformMethod` | Transform methods to use | Possible values: `DsigC14`, `DsigC14WithComments`, `DsigExcC14`, `DsigExcC14WithComments`, `DsigBase64` |
+
+#### Result
+
+| Property  | Type  | Description |Example|
+|-----------|-------|-------------|-------|
+| Result  | `string` | Depending on params OutputType and AddSignatureToSourceFile this contains either XML-string or filepath | |
+
 ## SplitXmlFile
 
 Splits XML file into smaller XML files. This allows processing bigger (>2GB) XML files that otherwise could cause performance issues.
@@ -221,6 +267,30 @@ A result object with parameters.
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
 | FilePaths | `List<string>` | List of new files. | `"F:\output\myfile.xml.0.part","F:\output\myfile.xml.1.part"` |
+
+### VerifySignedXml
+
+A task for verifying signatures on XML files.
+
+#### Input
+
+| Property  | Type  | Description |Example|
+|-----------|-------|-------------|-------|
+| XmlInputType  | `XmlParamType` | Choose input type | Possible values: `File`, `XML-string` |
+| XmlFilePath  | `string` | Path of the XML file to be signed. | `c:\temp\documentToVerify.xml` |
+| Xml  | `string` | File as XML-string | `XML-string` |
+
+#### Options
+
+| Property  | Type  | Description |Example|
+|-----------|-------|-------------|-------|
+| PreserveWhitespace  | `boolean` | Preserve whitespace when loading XML? | `true` |
+
+#### Result
+
+| Property  | Type  | Description |Example|
+|-----------|-------|-------------|-------|
+| IsValid  | `boolean` | Is document valid? | `true` |
 
 # Building
 

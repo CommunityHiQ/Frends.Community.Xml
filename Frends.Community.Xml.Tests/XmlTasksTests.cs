@@ -331,6 +331,203 @@ namespace Frends.Community.Xml.Tests
 
             Assert.Throws<XmlException>(() => XmlTasks.ConvertXmlToCsv(indata, new CancellationToken()));
         }
+    }
 
+    [TestFixture]
+    [Ignore("No .pfx file")]
+    public class SigningTaskTest
+    {
+        private readonly string _certificatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", "certwithpk.pfx");
+        private readonly string _privateKeyPassword = "password";
+
+        [SetUp]
+        public void Setup()
+        {
+        }
+
+        [TearDown]
+        public void Down()
+        {
+        }
+
+        [Test]
+        public void SignXml_ShouldSignXmlStringWithPrivateKeyCertificate()
+        {
+            var input = new SignXmlInput
+            {
+                CertificatePath = _certificatePath,
+                PrivateKeyPassword = _privateKeyPassword,
+                SigningStrategy = SigningStrategyType.PrivateKeyCertificate,
+                XmlInputType = XmlParamType.XmlString,
+                XmlEnvelopingType = XmlEnvelopingType.XmlEnvelopedSignature,
+                Xml = "<root><value>foo</value></root>"
+            };
+            var output = new SignXmlOutput
+            {
+                OutputType = XmlParamType.XmlString
+            };
+            var options = new SignXmlOptions
+            {
+                DigestMethod = DigestMethod.SHA256,
+                TransformMethods = new[] { TransformMethod.DsigExcC14 },
+                XmlSignatureMethod = XmlSignatureMethod.RSASHA256
+            };
+
+            SigningResult result = XmlTasks.SignXml(input, output, options, new CancellationToken());
+
+            StringAssert.Contains("<Signature", result.Result);
+        }
+
+        [Test]
+        public void SignXml_ShouldSignXmlFileWithPrivateKeyCertificate()
+        {
+            // create file
+            string xmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", Guid.NewGuid().ToString() + ".xml");
+            File.WriteAllText(xmlFilePath, @"<root>
+    <value>foo</value>
+</root>");
+            var input = new SignXmlInput
+            {
+                CertificatePath = _certificatePath,
+                PrivateKeyPassword = _privateKeyPassword,
+                SigningStrategy = SigningStrategyType.PrivateKeyCertificate,
+                XmlEnvelopingType = XmlEnvelopingType.XmlEnvelopedSignature,
+                XmlInputType = XmlParamType.File,
+                XmlFilePath = xmlFilePath
+            };
+            var output = new SignXmlOutput
+            {
+                OutputType = XmlParamType.File,
+                OutputFilePath = xmlFilePath.Replace(".xml", "_signed.xml"),
+                OutputEncoding = "utf-8"
+            };
+            var options = new SignXmlOptions
+            {
+                DigestMethod = DigestMethod.SHA256,
+                TransformMethods = new[] { TransformMethod.DsigExcC14 },
+                XmlSignatureMethod = XmlSignatureMethod.RSASHA256,
+                PreserveWhitespace = true
+            };
+
+            SigningResult result = XmlTasks.SignXml(input, output, options, new CancellationToken());
+            var signedXml = File.ReadAllText(result.Result);
+
+            StringAssert.Contains("<Signature", signedXml);
+            StringAssert.DoesNotContain("<Signature", File.ReadAllText(xmlFilePath));
+
+            // cleanup
+            File.Delete(xmlFilePath);
+            File.Delete(result.Result);
+        }
+
+        [Test]
+        public void SignXml_ShouldAddSignatureToSourceFile()
+        {
+            // create file
+            string xmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", Guid.NewGuid().ToString() + ".xml");
+            File.WriteAllText(xmlFilePath, @"<root>
+    <value>foo</value>
+</root>");
+            var input = new SignXmlInput
+            {
+                CertificatePath = _certificatePath,
+                PrivateKeyPassword = _privateKeyPassword,
+                SigningStrategy = SigningStrategyType.PrivateKeyCertificate,
+                XmlEnvelopingType = XmlEnvelopingType.XmlEnvelopedSignature,
+                XmlInputType = XmlParamType.File,
+                XmlFilePath = xmlFilePath
+            };
+            var output = new SignXmlOutput
+            {
+                OutputType = XmlParamType.File,
+                AddSignatureToSourceFile = true
+            };
+            var options = new SignXmlOptions
+            {
+                DigestMethod = DigestMethod.SHA256,
+                TransformMethods = new[] { TransformMethod.DsigExcC14 },
+                XmlSignatureMethod = XmlSignatureMethod.RSASHA256,
+                PreserveWhitespace = true
+            };
+
+            SigningResult result = XmlTasks.SignXml(input, output, options, new CancellationToken());
+            var signedXml = File.ReadAllText(result.Result);
+
+            StringAssert.Contains("<Signature", signedXml);
+
+            // cleanup
+            File.Delete(xmlFilePath);
+            File.Delete(result.Result);
+        }
+    }
+
+    [TestFixture]
+    [Ignore("No .pfx file")]
+    public class VerifyTaskTest
+    {
+        private readonly string _certificatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", "certwithpk.pfx");
+        private readonly string _privateKeyPassword = "password";
+
+        [SetUp]
+        public void Setup()
+        {
+        }
+
+        [TearDown]
+        public void Down()
+        {
+        }
+
+        [Test]
+        public void VerifySignedXml_ShouldVerifySignedXmlString()
+        {
+            var input = new SignXmlInput
+            {
+                CertificatePath = _certificatePath,
+                PrivateKeyPassword = _privateKeyPassword,
+                SigningStrategy = SigningStrategyType.PrivateKeyCertificate,
+                XmlInputType = XmlParamType.XmlString,
+                XmlEnvelopingType = XmlEnvelopingType.XmlEnvelopedSignature,
+                Xml = "<root><foo>bar</foo></root>"
+            };
+            var output = new SignXmlOutput
+            {
+                OutputType = XmlParamType.XmlString
+            };
+            var options = new SignXmlOptions
+            {
+                DigestMethod = DigestMethod.SHA256,
+                TransformMethods = new[] { TransformMethod.DsigExcC14 },
+                XmlSignatureMethod = XmlSignatureMethod.RSASHA256
+            };
+            string signedXml = XmlTasks.SignXml(input, output, options, new CancellationToken()).Result;
+            var verifyInput = new VerifySignatureInput
+            {
+                XmlInputType = XmlParamType.XmlString,
+                Xml = signedXml
+            };
+
+            var result = XmlTasks.VerifySignedXml(verifyInput, new VerifySignatureOptions(), new CancellationToken());
+
+            Assert.IsTrue(result.IsValid);
+        }
+
+        [Test]
+        public void VerifySignedXml_ShouldVerifySignedXmlDocument()
+        {
+            var input = new VerifySignatureInput
+            {
+                XmlInputType = XmlParamType.File,
+                XmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", "signed.xml")
+            };
+            var options = new VerifySignatureOptions
+            {
+                PreserveWhitespace = true
+            };
+
+            var result = XmlTasks.VerifySignedXml(input, options, new CancellationToken());
+
+            Assert.IsTrue(result.IsValid);
+        }
     }
 }

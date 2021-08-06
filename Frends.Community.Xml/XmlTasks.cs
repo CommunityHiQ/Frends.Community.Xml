@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,9 +21,9 @@ namespace Frends.Community.Xml
     public static class XmlTasks
     {
         /// <summary>
-        /// Combines 2 or more xml strings or documents to 1 xml string
+        /// Combines multiple XML strings or documents into a single XML. See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
-        /// <param name="input">XML strings or XML documents that will be merged</param>
+        /// <param name="input">XML strings or XML documents that will be merged together.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>string</returns>
         public static async Task<string> CombineXml([PropertyTab] CombineXmlInput input, CancellationToken cancellationToken)
@@ -78,8 +80,8 @@ namespace Frends.Community.Xml
         }
 
         /// <summary>
-        /// Task parses input data into XML data.
-        /// Supported input formats JSON, CSV and fixed-length.
+        /// Task parses input data into XML data. Supported input formats JSON, CSV and fixed-length.
+        /// See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="parameters">JSON or CSV string to be converted.</param>
         /// <param name="csvInputParameters">Parameters for conversion from CSV to XML.</param>
@@ -146,7 +148,7 @@ namespace Frends.Community.Xml
         }
 
         /// <summary>
-        /// Convert xml or json data into the csv formated data. Errors are always thrown by an exception. See: https://github.com/CommunityHiQ/Frends.Community.ConvertToCsv
+        /// Convert XML or JSON data into CSV formatted data. See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="input">Input XML</param>
         /// <param name="cancellationToken"></param>
@@ -155,13 +157,173 @@ namespace Frends.Community.Xml
         {
             DataSet dataset;
             dataset = new DataSet();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
             dataset.ReadXml(XmlReader.Create(new StringReader(input.InputXmlString)));
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             return new ConvertXmlToCsvOutput { Result = ConvertDataTableToCsv(dataset.Tables[0], input.CsvSeparator, input.IncludeHeaders, cancellationToken) };
         }
 
         /// <summary>
-        /// Splits XML file into smaller files. See https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// A task to sign an XML document. See: https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// </summary>
+        /// <param name="input">Parameters for input XML.</param>
+        /// <param name="output">Parameters for output XML.</param>
+        /// <param name="options">Options for the signing operation.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static SigningResult SignXml([PropertyTab] SignXmlInput input, [PropertyTab] SignXmlOutput output, [PropertyTab] SignXmlOptions options, CancellationToken cancellationToken)
+        {
+            var result = new SigningResult();
+            var xmldoc = new XmlDocument() { PreserveWhitespace = options.PreserveWhitespace };
+            StreamReader xmlStream = null;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (input.XmlInputType == XmlParamType.File)
+            {
+                xmlStream = new StreamReader(input.XmlFilePath);
+                xmldoc.Load(xmlStream);
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(input.Xml))
+                    throw new System.ArgumentException("Invalid input xml");
+                xmldoc.LoadXml(input.Xml);
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var signedXml = new SignedXml(xmldoc);
+
+            // determine signature method
+            switch (options.XmlSignatureMethod)
+            {
+                case XmlSignatureMethod.RSASHA1:
+                    signedXml.SignedInfo.SignatureMethod = SignedXml.XmlDsigRSASHA1Url;
+                    break;
+                case XmlSignatureMethod.RSASHA256:
+                    signedXml.SignedInfo.SignatureMethod = SignedXml.XmlDsigRSASHA256Url;
+                    break;
+                case XmlSignatureMethod.RSASHA384:
+                    signedXml.SignedInfo.SignatureMethod = SignedXml.XmlDsigRSASHA384Url;
+                    break;
+                case XmlSignatureMethod.RSASHA512:
+                    signedXml.SignedInfo.SignatureMethod = SignedXml.XmlDsigRSASHA512Url;
+                    break;
+            }
+
+            // determine how to sign
+            switch (input.SigningStrategy)
+            {
+                case SigningStrategyType.PrivateKeyCertificate:
+                    var cert = new X509Certificate2(input.CertificatePath, input.PrivateKeyPassword);
+                    signedXml.SigningKey = cert.GetRSAPrivateKey();
+
+                    // public key certificate is submitted with the xml document
+                    var keyInfo = new KeyInfo();
+                    keyInfo.AddClause(new KeyInfoX509Data(cert));
+                    signedXml.KeyInfo = keyInfo;
+                    break;
+            }
+
+            var reference = new Reference();
+            reference.AddTransform(new XmlDsigEnvelopedSignatureTransform(options.IncludeComments));
+
+            // add different transforms
+            foreach (var transform in options.TransformMethods)
+            {
+                switch (transform)
+                {
+                    case TransformMethod.DsigBase64:
+                        reference.AddTransform(new XmlDsigBase64Transform());
+                        break;
+                    case TransformMethod.DsigC14:
+                        reference.AddTransform(new XmlDsigC14NTransform());
+                        break;
+                    case TransformMethod.DsigC14WithComments:
+                        reference.AddTransform(new XmlDsigC14NWithCommentsTransform());
+                        break;
+                    case TransformMethod.DsigExcC14:
+                        reference.AddTransform(new XmlDsigExcC14NTransform());
+                        break;
+                    case TransformMethod.DsigExcC14WithComments:
+                        reference.AddTransform(new XmlDsigExcC14NWithCommentsTransform());
+                        break;
+                }
+            }
+
+            // target the whole xml document
+            reference.Uri = "";
+
+            // add digest method
+            switch (options.DigestMethod)
+            {
+                case DigestMethod.SHA1:
+                    reference.DigestMethod = SignedXml.XmlDsigSHA1Url;
+                    break;
+                case DigestMethod.SHA256:
+                    reference.DigestMethod = SignedXml.XmlDsigSHA256Url;
+                    break;
+                case DigestMethod.SHA384:
+                    reference.DigestMethod = SignedXml.XmlDsigSHA384Url;
+                    break;
+                case DigestMethod.SHA512:
+                    reference.DigestMethod = SignedXml.XmlDsigSHA512Url;
+                    break;
+            }
+
+            // add references to signed xml
+            signedXml.AddReference(reference);
+
+            // compute the signature
+            signedXml.ComputeSignature();
+
+            // as this is Xml Enveloped Signature,
+            // add the signature element to the original xml as the last child of the root element
+            xmldoc.DocumentElement.AppendChild(xmldoc.ImportNode(signedXml.GetXml(), true));
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // output results either to a file or result object
+            if (output.OutputType == XmlParamType.File)
+            {
+                xmlStream.Dispose();
+
+                if (output.AddSignatureToSourceFile)
+                {
+                    // signed xml document is written in target destination
+                    xmldoc.Save(input.XmlFilePath);
+
+                    // and result will indicate the source file path
+                    result.Result = input.XmlFilePath;
+                }
+                else
+                {
+                    // signed xml document is written in target destination
+                    using (var writer = new XmlTextWriter(output.OutputFilePath, Encoding.GetEncoding(output.OutputEncoding)))
+                    {
+                        xmldoc.Save(writer);
+                    }
+
+                    // and result will indicate the document path
+                    result.Result = output.OutputFilePath;
+                }
+            }
+            else
+            {
+                // signed xml document is returned from task
+                result.Result = xmldoc.OuterXml;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Splits XML file into smaller files. See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="Input">Input XML to be split.</param>
         /// <param name="Options">Configuration for splitting the XML.</param>
@@ -215,6 +377,62 @@ namespace Frends.Community.Xml
             }
 
             return new SplitXmlFileResult() { FilePaths = returnArray };
+        }
+
+        /// <summary>
+        /// A task to verify the signature of a signed XML. See: https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// </summary>
+        /// <param name="input">Parameters for input XML.</param>
+        /// <param name="options">Additional options for verifications.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static VerifySignatureResult VerifySignedXml([PropertyTab] VerifySignatureInput input, [PropertyTab] VerifySignatureOptions options, CancellationToken cancellationToken)
+        {
+            var result = new VerifySignatureResult();
+            var xmldoc = new XmlDocument() { PreserveWhitespace = options.PreserveWhitespace };
+            StreamReader xmlStream = null;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (input.XmlInputType == XmlParamType.File)
+            {
+                xmlStream = new StreamReader(input.XmlFilePath);
+                xmldoc.Load(xmlStream);
+            }
+            else
+            {
+                xmldoc.LoadXml(input.Xml);
+            }
+
+            // load the signature node
+            var signedXml = new SignedXml(xmldoc);
+            signedXml.LoadXml((XmlElement)xmldoc.GetElementsByTagName("Signature")[0]);
+
+            X509Certificate2 certificate = null;
+
+            foreach (KeyInfoClause clause in signedXml.KeyInfo)
+            {
+                if (clause is KeyInfoX509Data)
+                {
+                    if (((KeyInfoX509Data)clause).Certificates.Count > 0)
+                    {
+                        certificate = (X509Certificate2)((KeyInfoX509Data)clause).Certificates[0];
+                    }
+                }
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Check the signature and return the result.
+            result.IsValid = signedXml.CheckSignature(certificate, true);
+
+            // close stream if input was a file
+            if (input.XmlInputType == XmlParamType.File)
+            {
+                xmlStream.Dispose();
+            }
+
+            return result;
         }
 
         private static XmlDocument InitiateNewDocument(string Rootname)
