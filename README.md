@@ -326,4 +326,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | Version | Changes |
 | ------- | ------- |
 | 1.0.0   | First version. Includes task SplitXmlFile |
-| 2.0.0   | CombineXml, ConvertToXml, ConvertXmlToCsv and XmlSignature tasks included. |
+| 2.0.0   | CombineXml, ConvertToXml, ConvertXmlToCsv, SignXml and VerifySignedXml tasks included. |
