@@ -76,6 +76,78 @@ Combines two or more xml strings or xml documents to one xml string
 |---------------|----------|----------------------------------|-----------------------------|
 | Result        | ``string`` | Result as XML	| `<NewDataSet><Table1><Column1>first</Column1><Column2>second</Column2><Column3>third</Column3></Table1></NewDataSet>` |
 
+## ConvertXmlToCsv
+
+### Input
+
+| Property				|  Type   | Description								| Example                     |
+|-----------------------|---------|-----------------------------------------|-----------------------------|
+| InputData				| ``string`` | XML string to be converted into csv. | See below. |
+| CsvSeparator			| ``string`` | Separator for the output columns.	| `;` |
+| IncludeHeaders		| ``bool`` | True if the column headers should be included into the output	| `true` |
+
+Example input:
+```
+<root>
+	<row id='1'>
+		<name>Google</name>
+		<url>https://en.wikipedia.org/wiki/Google</url>
+		<fancy_characters>comma (,) inside field</fancy_characters>
+	</row>
+	<row id='2'>
+		<name>Apple</name>
+		<url>https://en.wikipedia.org/wiki/Apple_Inc.</url>
+		<fancy_characters>Kanji </fancy_characters>
+	</row>
+	<row id='3'>
+		<name>Missing columns</name>
+	</row>
+</root>
+```
+
+### Result
+
+| Property      | Type     | Description                      | Example                     |
+|---------------|----------|----------------------------------|-----------------------------|
+| Result        | ``string``   | Result as CSV	| See below. |
+
+Example output, for input given above, with comma as a delimeter and headers included:
+```
+name,url,fancy_characters,id
+Google,https://en.wikipedia.org/wiki/Google,"comma (,) inside field",1
+Apple,https://en.wikipedia.org/wiki/Apple_Inc.,Kanji ,2
+Missing columns,,,3
+```
+
+If input XML string contains multiple fields with same name, they are omited. Also rows must be in element with same name. If id is not given for row as a attribute filed named rowname_Id is added, with row number. 
+
+For example, following XML:
+```
+<table>
+	<foo>
+		<bar>700</bar>
+		<foobar>12</foobar>
+	</foo>
+	<foo>
+		<bar>800</bar>
+		<bar>800</bar>
+		<foobar>5</foobar>
+	</foo>
+	<invalid>
+		<bar>200</bar>
+		<foobar>7</foobar>
+	</invalid>
+</table>
+```
+
+is thus converted to, using comma as a delimeter and headers included:
+
+```
+foo_Id,foobar
+0,12
+1,5
+```
+
 ## SplitXMLFile
 
 Splits XML file into smaller XML files. This allows processing bigger (>2GB) XML files that otherwise could cause performance issues.
