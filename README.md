@@ -87,7 +87,18 @@ Task parses input data into XML data. Supported input formats JSON, CSV and fixe
 
 | Property      | Type     | Description                      | Example                     |
 |---------------|----------|----------------------------------|-----------------------------|
-| Result        | ``string`` | Result as XML	| `<NewDataSet><Table1><Column1>first</Column1><Column2>second</Column2><Column3>third</Column3></Table1></NewDataSet>` |
+| Result        | ``string`` | Result as XML	| See below. |
+
+```
+<NewDataSet>
+	<Table1>
+		<Column1>first</Column1>
+		<Column2>second</Column2>
+		<Column3>third</Column3>
+	</Table1>
+</NewDataSet>
+
+```
 
 ## ConvertXmlToCsv
 
