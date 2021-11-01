@@ -5,14 +5,15 @@ using System.IO;
 using System.Xml;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Frends.Community.Xml.Tests
 {
     [TestFixture]
     public class SplitXMLFileTests
     {
-        private string _minifiedInputPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestFiles\12_products_minified.xml");
-        private string _prettyInputPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestFiles\12_products_pretty.xml");
+        private readonly string _minifiedInputPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles", "12_products_minified.xml");
+        private readonly string _prettyInputPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles", "12_products_pretty.xml");
         private string _tempOutputFolder;
 
         [SetUp]
@@ -23,7 +24,7 @@ namespace Frends.Community.Xml.Tests
             if (!Directory.Exists(_tempOutputFolder))
             {
                 Directory.CreateDirectory(_tempOutputFolder);
-            }            
+            }
         }
 
         [TearDown]
@@ -46,8 +47,8 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestMinifiedXML_even()
         {
-            var input = new SplitXmlFileInput() { InputFilePath = _minifiedInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
-            var opt = new SplitXmlFileOptions() {ElementCountInEachFile = 4, OutputFileRootNodeName = "root"};
+            var input = new SplitXmlFileInput { InputFilePath = _minifiedInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
+            var opt = new SplitXmlFileOptions {ElementCountInEachFile = 4, OutputFileRootNodeName = "root"};
 
             var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
@@ -74,8 +75,8 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestPrettyXML_uneven()
         {
-            var input = new SplitXmlFileInput() { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
-            var opt = new SplitXmlFileOptions() { ElementCountInEachFile = 10, OutputFileRootNodeName = "root" };
+            var input = new SplitXmlFileInput { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
+            var opt = new SplitXmlFileOptions { ElementCountInEachFile = 10, OutputFileRootNodeName = "root" };
 
             var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
@@ -96,8 +97,8 @@ namespace Frends.Community.Xml.Tests
         {
             string expectedRootElement = "TestRoot";
 
-            var input = new SplitXmlFileInput() { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
-            var opt = new SplitXmlFileOptions() { ElementCountInEachFile = 20, OutputFileRootNodeName = expectedRootElement };
+            var input = new SplitXmlFileInput { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
+            var opt = new SplitXmlFileOptions { ElementCountInEachFile = 20, OutputFileRootNodeName = expectedRootElement };
 
             var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
@@ -116,8 +117,8 @@ namespace Frends.Community.Xml.Tests
     {
         private string _xmlString1;
         private string _xmlString2;
-        private XmlDocument _xmlDoc1 = new XmlDocument();
-        private XmlDocument _xmlDoc2 = new XmlDocument();
+        private readonly XmlDocument _xmlDoc1 = new XmlDocument();
+        private readonly XmlDocument _xmlDoc2 = new XmlDocument();
 
         private CombineXmlInput _input;
         private CombineXmlInputXml[] _inputXmls = new CombineXmlInputXml[2];
@@ -299,24 +300,35 @@ namespace Frends.Community.Xml.Tests
             };
 
             var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
-            System.Console.WriteLine(result.Result);
-            Assert.AreEqual(TestFiles.ConvertXmlToCsvTestData.ExpectedCsvResult, result.Result);
+            Assert.AreEqual(TestFiles.ConvertXmlToCsvTestData.ExpectedCsvResult, result.Result.Replace(Environment.NewLine, "\n"));
         }
 
         [Test]
 
         public void TestConvertXmlToCsvWithSpecialCharacters()
         {
-            var indata = new ConvertXmlToCsvInput
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                InputXmlString = "<root><v1>foo1</v1><v2>bar2;bar2</v2><v3>baz3\r\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
-                CsvSeparator = ";",
-                IncludeHeaders = true
-            };
-
-            var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
-            System.Console.WriteLine(result.Result);
-            Assert.AreEqual("v1;v2;v3;v4\r\nfoo1;\"bar2;bar2\";\"baz3\nbaz3\";\"\"\"fo\"\"o4\"\"\"\r\n", result.Result);
+                var indata = new ConvertXmlToCsvInput
+                {
+                    InputXmlString = "<root><v1>foo1</v1><v2>bar2;bar2</v2><v3>baz3\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
+                    CsvSeparator = ";",
+                    IncludeHeaders = true
+                };
+                var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
+                Assert.AreEqual("v1;v2;v3;v4\nfoo1;\"bar2;bar2\";\"baz3\nbaz3\";\"\"\"fo\"\"o4\"\"\"\n", result.Result);
+            }
+            else
+            {
+                var indata = new ConvertXmlToCsvInput
+                {
+                    InputXmlString = "<root><v1>foo1</v1><v2>bar2;bar2</v2><v3>baz3\r\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
+                    CsvSeparator = ";",
+                    IncludeHeaders = true
+                };
+                var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
+                Assert.AreEqual("v1;v2;v3;v4\r\nfoo1;\"bar2;bar2\";\"baz3\nbaz3\";\"\"\"fo\"\"o4\"\"\"\r\n", result.Result);
+            }
         }
 
         [Test]
@@ -334,7 +346,9 @@ namespace Frends.Community.Xml.Tests
     }
 
     [TestFixture]
-    [Ignore("No .pfx file")]
+#if !_WINDOWS
+    [Ignore("No .pfx file")] // Signature creation not working in Linux.
+#endif
     public class SigningTaskTest
     {
         private readonly string _certificatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", "certwithpk.pfx");
@@ -343,11 +357,13 @@ namespace Frends.Community.Xml.Tests
         [SetUp]
         public void Setup()
         {
+            TestFiles.CreateSignatureFile.GenerateSignatureFile(_certificatePath, _privateKeyPassword);
         }
 
         [TearDown]
         public void Down()
         {
+            File.Delete(_certificatePath);
         }
 
         [Test]
@@ -462,7 +478,9 @@ namespace Frends.Community.Xml.Tests
     }
 
     [TestFixture]
-    [Ignore("No .pfx file")]
+#if !_WINDOWS
+    [Ignore("No .pfx file")] // Signature creation not working in Linux.
+#endif
     public class VerifyTaskTest
     {
         private readonly string _certificatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", "certwithpk.pfx");
@@ -471,11 +489,14 @@ namespace Frends.Community.Xml.Tests
         [SetUp]
         public void Setup()
         {
+
+            TestFiles.CreateSignatureFile.GenerateSignatureFile(_certificatePath, _privateKeyPassword);
         }
 
         [TearDown]
         public void Down()
         {
+            File.Delete(_certificatePath);
         }
 
         [Test]
@@ -518,7 +539,7 @@ namespace Frends.Community.Xml.Tests
             var input = new VerifySignatureInput
             {
                 XmlInputType = XmlParamType.File,
-                XmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", "signed.xml")
+                XmlFilePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..", "TestFiles", "signed.xml"))
             };
             var options = new VerifySignatureOptions
             {

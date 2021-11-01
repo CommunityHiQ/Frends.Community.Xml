@@ -1,15 +1,12 @@
-﻿using System;
-
-namespace Frends.Community.Xml.Tests.TestFiles
+﻿namespace Frends.Community.Xml.Tests.TestFiles
 {
     public static class ConvertXmlToCsvTestData
     {
         private static string _testXml;
         private static string _expectedCsvResult;
         private static string _testJSON;
-        private static string _invalidJSON;
 
-        public static String TestXml
+        public static string TestXml
         {
             get
             {

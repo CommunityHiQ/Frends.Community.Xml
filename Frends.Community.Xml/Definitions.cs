@@ -1,4 +1,4 @@
-﻿#pragma warning disable 1591
+﻿#pragma warning disable CS1591
 
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +6,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Community.Xml
 {
+    /// <summary>
+    /// Input-class for CombineXML-task
+    /// </summary>
     public class CombineXmlInput
     {
         /// <summary>
@@ -21,6 +24,9 @@ namespace Frends.Community.Xml
         public string XmlRootElementName { set; get; }
     }
 
+    /// <summary>
+    /// Class for an array of XMLs with child element names
+    /// </summary>
     public class CombineXmlInputXml
     {
         /// <summary>
@@ -36,6 +42,9 @@ namespace Frends.Community.Xml
         public string ChildElementName { set; get; }
     }
 
+    /// <summary>
+    /// An array of XMLs with child element names
+    /// </summary>
     public class ColumnLength
     {
         /// <summary>
@@ -44,6 +53,9 @@ namespace Frends.Community.Xml
         public int Length { set; get; }
     }
 
+    /// <summary>
+    /// JSON input class for ConvertToXml-task
+    /// </summary>
     public class ConvertToXmlJsonInputParameters
     {
         /// <summary>
@@ -57,6 +69,9 @@ namespace Frends.Community.Xml
         public string AppendToFieldName { get; set; }
     }
 
+    /// <summary>
+    /// CSV input class for ConvertToXml-task
+    /// </summary>
     public class ConvertToXmlCsvInputParameters
     {
         /// <summary>
@@ -79,6 +94,10 @@ namespace Frends.Community.Xml
         /// </summary>
         public bool TrimOuputColumns { get; set; }
     }
+
+    /// <summary>
+    /// Input class for ConvertToXml-task
+    /// </summary>
     public class ConvertToXmlParameters
     {
         /// <summary>
@@ -87,6 +106,9 @@ namespace Frends.Community.Xml
         public string Input { get; set; }
     }
 
+    /// <summary>
+    /// Output class for ConvertToXml-task
+    /// </summary>
     public class ConvertToXmlOutput
     {
         /// <summary>
@@ -95,6 +117,9 @@ namespace Frends.Community.Xml
         public string Result { get; set; }
     }
 
+    /// <summary>
+    /// Input class for ConvertXmlToCsv-task
+    /// </summary>
     public class ConvertXmlToCsvInput
     {
         /// <summary>
@@ -116,6 +141,9 @@ namespace Frends.Community.Xml
         public bool IncludeHeaders { get; set; }
     }
 
+    /// <summary>
+    /// Output class for ConvertXmlToCsv-task
+    /// </summary>
     public class ConvertXmlToCsvOutput
     {
         /// <summary>
@@ -124,8 +152,14 @@ namespace Frends.Community.Xml
         public string Result { get; set; }
     }
 
+    /// <summary>
+    /// Input class for SignXml-task
+    /// </summary>
     public class SignXmlInput
     {
+        /// <summary>
+        /// Input type. Possible types are File and XmlString
+        /// </summary>
         public XmlParamType XmlInputType { get; set; }
 
         /// <summary>
@@ -170,6 +204,9 @@ namespace Frends.Community.Xml
         public string PrivateKeyPassword { get; set; }
     }
 
+    /// <summary>
+    /// Output class for SignXml-task
+    /// </summary>
     public class SignXmlOutput
     {
         /// <summary>
@@ -200,8 +237,14 @@ namespace Frends.Community.Xml
         public bool AddSignatureToSourceFile { get; set; }
     }
 
+    /// <summary>
+    /// Options class for SignXml-task
+    /// </summary>
     public class SignXmlOptions
     {
+        /// <summary>
+        /// Switch to include comments
+        /// </summary>
         public bool IncludeComments { get; set; }
 
         /// <summary>
@@ -225,6 +268,9 @@ namespace Frends.Community.Xml
         public TransformMethod[] TransformMethods { get; set; }
     }
 
+    /// <summary>
+    /// Output class for SignXml-task
+    /// </summary>
     public class SigningResult
     {
         /// <summary>
@@ -242,16 +288,20 @@ namespace Frends.Community.Xml
         XmlString
     }
 
+    /// <summary>
+    /// XML signature strategy for SignXml-task
+    /// </summary>
     public enum SigningStrategyType
     {
         PrivateKeyCertificate
     }
 
+    /// <summary>
+    /// Signature enveloping type for SignXml-task
+    /// </summary>
     public enum XmlEnvelopingType
     {
         XmlEnvelopedSignature
-        //XmlEnvelopingSignature // not supported
-        //XmlDetachedSignature // not supported
     }
 
     /// <summary>
@@ -288,6 +338,9 @@ namespace Frends.Community.Xml
         SHA512
     }
 
+    /// <summary>
+    /// Input class for SplitXmlFile-task
+    /// </summary>
     public class SplitXmlFileInput
     {
         /// <summary>
@@ -312,6 +365,9 @@ namespace Frends.Community.Xml
         public string OutputFilesDirectory { get; set; }
     }
 
+    /// <summary>
+    /// Options class for SplitXmlFile-task
+    /// </summary>
     public class SplitXmlFileOptions
     {
         /// <summary>
@@ -328,6 +384,9 @@ namespace Frends.Community.Xml
         public string OutputFileRootNodeName { get; set; }
     }
 
+    /// <summary>
+    /// Output class for SplitXml-task
+    /// </summary>
     public class SplitXmlFileResult
     {
         /// <summary>
@@ -336,6 +395,9 @@ namespace Frends.Community.Xml
         public List<string> FilePaths;
     }
 
+    /// <summary>
+    /// Input class for VerifySignedXml-task
+    /// </summary>
     public class VerifySignatureInput
     {
         /// <summary>
@@ -359,6 +421,9 @@ namespace Frends.Community.Xml
         public string Xml { get; set; }
     }
 
+    /// <summary>
+    /// Options class for VerifySignedXml-task
+    /// </summary>
     public class VerifySignatureOptions
     {
         /// <summary>
@@ -367,6 +432,9 @@ namespace Frends.Community.Xml
         public bool PreserveWhitespace { get; set; }
     }
 
+    /// <summary>
+    /// Output class for VerifySignedXml-task
+    /// </summary>
     public class VerifySignatureResult
     {
         /// <summary>
