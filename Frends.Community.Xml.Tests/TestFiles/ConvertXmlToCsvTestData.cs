@@ -1,4 +1,6 @@
-﻿namespace Frends.Community.Xml.Tests.TestFiles
+﻿using System;
+
+namespace Frends.Community.Xml.Tests.TestFiles
 {
     public static class ConvertXmlToCsvTestData
     {
@@ -41,10 +43,12 @@
             {
                 if (string.IsNullOrEmpty(_expectedCsvResult))
                 {
-                    _expectedCsvResult = @"Title,Artist,Country,Company,Price,Year
-asd,asd,asd,asd,asd,asd
-1234132,123123,123123,12312,312312312,314234
-";
+                    _expectedCsvResult = "Title,Artist,Country,Company,Price,Year" +
+                        Environment.NewLine +
+                        "asd,asd,asd,asd,asd,asd" +
+                        Environment.NewLine +
+                        "1234132,123123,123123,12312,312312312,314234" +
+                        Environment.NewLine;
                 }
                 return _expectedCsvResult;
             }

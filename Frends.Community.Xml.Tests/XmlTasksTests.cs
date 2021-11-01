@@ -300,7 +300,7 @@ namespace Frends.Community.Xml.Tests
             };
 
             var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
-            Assert.AreEqual(TestFiles.ConvertXmlToCsvTestData.ExpectedCsvResult, result.Result.Replace(Environment.NewLine, "\n"));
+            Assert.AreEqual(TestFiles.ConvertXmlToCsvTestData.ExpectedCsvResult, result.Result);
         }
 
         [Test]
