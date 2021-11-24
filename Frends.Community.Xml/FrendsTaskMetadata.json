@@ -1,7 +1,22 @@
 ﻿{
 	"Tasks": [
 		{
-			"TaskMethod": "Frends.Community.Xml.XmlTasks.SplitXMLFile"
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.CombineXml"
+		},
+		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.ConvertToXml"
+		},
+		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.ConvertXmlToCsv"
+		},
+		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.SignXml"
+		},
+		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.SplitXmlFile"
+		},
+		{
+			"TaskMethod": "Frends.Community.Xml.XmlTasks.VerifySignedXml"
 		}
 	]
 }
