@@ -311,23 +311,23 @@ namespace Frends.Community.Xml.Tests
             {
                 var indata = new ConvertXmlToCsvInput
                 {
-                    InputXmlString = "<root><v1>foo1</v1><v2>bar2;bar2</v2><v3>baz3\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
+                    InputXmlString = "<root><v1>foo1</v1><v2>bar2,bar2</v2><v3>baz3\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
                     CsvSeparator = ";",
                     IncludeHeaders = true
                 };
                 var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
-                Assert.AreEqual("v1;v2;v3;v4\nfoo1;\"bar2;bar2\";\"baz3\nbaz3\";\"\"\"fo\"\"o4\"\"\"\n", result.Result);
+                Assert.AreEqual("v1;v2;v3;v4\nfoo1;bar2,bar2;\"baz3\nbaz3\";\"\"\"fo\"\"o4\"\"\"\n", result.Result);
             }
             else
             {
                 var indata = new ConvertXmlToCsvInput
                 {
-                    InputXmlString = "<root><v1>foo1</v1><v2>bar2;bar2</v2><v3>baz3\r\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
+                    InputXmlString = "<root><v1>foo1</v1><v2>bar2,bar2</v2><v3>baz3\r\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
                     CsvSeparator = ";",
                     IncludeHeaders = true
                 };
                 var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
-                Assert.AreEqual("v1;v2;v3;v4\r\nfoo1;\"bar2;bar2\";\"baz3\nbaz3\";\"\"\"fo\"\"o4\"\"\"\r\n", result.Result);
+                Assert.AreEqual("v1;v2;v3;v4\r\nfoo1;bar2,bar2;\"baz3\nbaz3\";\"\"\"fo\"\"o4\"\"\"\r\n", result.Result);
             }
         }
 

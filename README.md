@@ -338,3 +338,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | ------- | ------- |
 | 1.0.0   | First version. Includes task SplitXmlFile |
 | 2.0.0   | CombineXml, ConvertToXml, ConvertXmlToCsv, SignXml and VerifySignedXml tasks included. |
+| 3.0.0   | Fixed issue #3 by creating throw when separator is used in input. |

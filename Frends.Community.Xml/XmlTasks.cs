@@ -507,7 +507,8 @@ namespace Frends.Community.Xml
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var fields = row.ItemArray.Select(field => field.ToString());
-                fields = fields.Select(x => (x.Contains(separator) || x.Contains("\n") || x.Contains("\"")) ? "\"" + x.Replace("\"", "\"\"") + "\"" : x); // Fixes cases where input field contains special characters
+                fields = fields.Select(x => (x.Contains(separator) ? throw new XmlException("field contains the separator") : x)); // Throws error incase field contains the separator
+                fields = fields.Select(x => (x.Contains("\n") || x.Contains("\"")) ? "\"" + x.Replace("\"", "\"\"") + "\"" : x); // Fixes cases where input field contains special characters
                 stringBuilder.AppendLine(string.Join(separator, fields));
             }
 
