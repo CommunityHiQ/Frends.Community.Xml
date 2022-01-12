@@ -332,6 +332,47 @@ namespace Frends.Community.Xml.Tests
         }
 
         [Test]
+        public void TestConvertToCsv_Xml_WithSeparator_ShouldThrowAnException()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                var indata = new ConvertXmlToCsvInput
+                {
+                    InputXmlString = "<root><v1>foo1</v1><v2>bar2;bar2</v2><v3>baz3\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
+                    CsvSeparator = ";",
+                    IncludeHeaders = true
+                };
+
+                void ConvertThatThrows()
+                {
+                    var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
+                }
+
+                Assert.That(ConvertThatThrows,
+                    Throws.TypeOf<XmlException>()
+                        .With.Message.EqualTo("Field contains the separator"));
+            }
+            else
+            {
+                var indata = new ConvertXmlToCsvInput
+                {
+                    InputXmlString = "<root><v1>foo1</v1><v2>bar2;bar2</v2><v3>baz3\r\nbaz3</v3><v4>\"fo\"o4\"</v4></root>",
+                    CsvSeparator = ";",
+                    IncludeHeaders = true
+                };
+
+                void ConvertThatThrows()
+                {
+                    var result = XmlTasks.ConvertXmlToCsv(indata, new CancellationToken());
+                }
+                
+                Assert.That(ConvertThatThrows, 
+                    Throws.TypeOf<XmlException>()
+                        .With.Message.EqualTo("Field contains the separator"));
+            }
+        }
+
+        [Test]
         public void TestConvertToCsv_Xml_WithWrongFileType_ShouldThrowAnException()
         {
             var indata = new ConvertXmlToCsvInput
