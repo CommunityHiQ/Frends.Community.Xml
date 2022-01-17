@@ -30,14 +30,11 @@ namespace Frends.Community.Xml
         {
             var inputXmls = input.InputXmls;
 
-            // Check invalid inputs
+            // Check invalid inputs.
             var invalids = inputXmls.Where(f => f.Xml.GetType() != typeof(string) && f.Xml.GetType() != typeof(XmlDocument)).Select(f => f.ChildElementName).ToList();
-            if (invalids.Any())
-            {
-                throw new FormatException("Unsupported input type found in ChildElements: " + string.Join(", ", invalids) + ". The supported types are XmlDocument and String.");
-            }
+            if (invalids.Any()) throw new FormatException("Unsupported input type found in ChildElements: " + string.Join(", ", invalids) + ". The supported types are XmlDocument and String.");
 
-            // Combine
+            // Combine.
             using (var sw = new StringWriter())
             {
                 using (var xw = XmlWriter.Create(sw, new XmlWriterSettings { Async = true, OmitXmlDeclaration = true }))
@@ -51,27 +48,16 @@ namespace Frends.Community.Xml
                         xw.WriteStartElement(xml.ChildElementName);
 
                         var xmlDoc = new XmlDocument();
-                        if (xml.Xml.GetType() == typeof(XmlDocument))
-                        {
-                            xmlDoc = (XmlDocument)xml.Xml;
-                        }
-                        else
-                        {
-                            xmlDoc.LoadXml((string)xml.Xml);
-                        }
+                        if (xml.Xml.GetType() == typeof(XmlDocument)) xmlDoc = (XmlDocument)xml.Xml;
+                        else xmlDoc.LoadXml((string)xml.Xml);
                         using (var xr = new XmlNodeReader(xmlDoc))
                         {
                             xr.Read();
-                            if (xr.NodeType.Equals(XmlNodeType.XmlDeclaration))
-                            {
-                                xr.Read();
-                            }
+                            if (xr.NodeType.Equals(XmlNodeType.XmlDeclaration)) xr.Read();
                             await xw.WriteNodeAsync(xr, false).ConfigureAwait(false);
                         }
-                        cancellationToken.ThrowIfCancellationRequested();
                         xw.WriteEndElement();
                     }
-                    cancellationToken.ThrowIfCancellationRequested();
                     xw.WriteEndElement();
                     xw.WriteEndDocument();
                 }
@@ -80,7 +66,8 @@ namespace Frends.Community.Xml
         }
 
         /// <summary>
-        /// Task parses input data into XML data. Supported input formats JSON, CSV and fixed-length.
+        /// Task parses input data into XML data.
+        /// Supported input formats JSON, CSV and fixed-length.
         /// See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="parameters">JSON or CSV string to be converted.</param>
@@ -101,8 +88,6 @@ namespace Frends.Community.Xml
                 if (jsonInputParameters.AppendToFieldName == null)
                     return new ConvertToXmlOutput { Result = JsonConvert.DeserializeXmlNode(parameters.Input, jsonInputParameters.XMLRootElementName).OuterXml };
 
-                cancellationToken.ThrowIfCancellationRequested();
-
                 var jsonObject = (JObject) JsonConvert.DeserializeObject(parameters.Input);
                 var newObject = ChangeNumericKeys(jsonObject, jsonInputParameters.AppendToFieldName);
                 return new ConvertToXmlOutput { Result = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(newObject), jsonInputParameters.XMLRootElementName).OuterXml };
@@ -110,11 +95,9 @@ namespace Frends.Community.Xml
 
             if (!string.IsNullOrEmpty(csvInputParameters.CSVSeparator) && parameters.Input.Contains(csvInputParameters.CSVSeparator))
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
                 using (var parser = new GenericParserAdapter())
                 {
-                    char? separator = Convert.ToChar(csvInputParameters.CSVSeparator);
+                    var separator = Convert.ToChar(csvInputParameters.CSVSeparator);
                     parser.SetDataSource(new StringReader(parameters.Input));
                     parser.ColumnDelimiter = separator;
                     parser.FirstRowHasHeader = csvInputParameters.InputHasHeaderRow;
@@ -133,7 +116,6 @@ namespace Frends.Community.Xml
                 foreach (var column in csvInputParameters.ColumnLengths)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-
                     headerList.Add(column.Length);
                 }
                 var headerArray = headerList.ToArray();
@@ -148,27 +130,22 @@ namespace Frends.Community.Xml
         }
 
         /// <summary>
-        /// Convert XML or JSON data into CSV formatted data. See: https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// Convert XML or JSON data into CSV formatted data.
+        /// See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="input">Input XML</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Object {string Result }</returns>
         public static ConvertXmlToCsvOutput ConvertXmlToCsv([PropertyTab] ConvertXmlToCsvInput input, CancellationToken cancellationToken)
         {
-            DataSet dataset;
-            dataset = new DataSet();
-
-            cancellationToken.ThrowIfCancellationRequested();
-
+            var dataset = new DataSet();
             dataset.ReadXml(XmlReader.Create(new StringReader(input.InputXmlString)));
-
-            cancellationToken.ThrowIfCancellationRequested();
-
             return new ConvertXmlToCsvOutput { Result = ConvertDataTableToCsv(dataset.Tables[0], input.CsvSeparator, input.IncludeHeaders, cancellationToken) };
         }
 
         /// <summary>
-        /// A task to sign an XML document. See: https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// A task to sign an XML document.
+        /// See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="input">Parameters for input XML.</param>
         /// <param name="output">Parameters for output XML.</param>
@@ -181,8 +158,6 @@ namespace Frends.Community.Xml
             var xmldoc = new XmlDocument() { PreserveWhitespace = options.PreserveWhitespace };
             StreamReader xmlStream = null;
 
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (input.XmlInputType == XmlParamType.File)
             {
                 xmlStream = new StreamReader(input.XmlFilePath);
@@ -190,16 +165,13 @@ namespace Frends.Community.Xml
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(input.Xml))
-                    throw new System.ArgumentException("Invalid input xml");
+                if (string.IsNullOrWhiteSpace(input.Xml)) throw new ArgumentException("Invalid input xml");
                 xmldoc.LoadXml(input.Xml);
             }
 
-            cancellationToken.ThrowIfCancellationRequested();
-
             var signedXml = new SignedXml(xmldoc);
 
-            // determine signature method
+            // Determine signature method.
             switch (options.XmlSignatureMethod)
             {
                 case XmlSignatureMethod.RSASHA1:
@@ -216,14 +188,14 @@ namespace Frends.Community.Xml
                     break;
             }
 
-            // determine how to sign
+            // Determine how to sign.
             switch (input.SigningStrategy)
             {
                 case SigningStrategyType.PrivateKeyCertificate:
                     var cert = new X509Certificate2(input.CertificatePath, input.PrivateKeyPassword);
                     signedXml.SigningKey = cert.GetRSAPrivateKey();
 
-                    // public key certificate is submitted with the xml document
+                    // Public key certificate is submitted with the XML document.
                     var keyInfo = new KeyInfo();
                     keyInfo.AddClause(new KeyInfoX509Data(cert));
                     signedXml.KeyInfo = keyInfo;
@@ -233,9 +205,10 @@ namespace Frends.Community.Xml
             var reference = new Reference();
             reference.AddTransform(new XmlDsigEnvelopedSignatureTransform(options.IncludeComments));
 
-            // add different transforms
+            // Add different transforms.
             foreach (var transform in options.TransformMethods)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 switch (transform)
                 {
                     case TransformMethod.DsigBase64:
@@ -256,10 +229,10 @@ namespace Frends.Community.Xml
                 }
             }
 
-            // target the whole xml document
+            // Target the whole XML document.
             reference.Uri = "";
 
-            // add digest method
+            // Add digest method.
             switch (options.DigestMethod)
             {
                 case DigestMethod.SHA1:
@@ -276,46 +249,43 @@ namespace Frends.Community.Xml
                     break;
             }
 
-            // add references to signed xml
+            // Add references to signed XML.
             signedXml.AddReference(reference);
 
-            // compute the signature
+            // Compute the signature.
             signedXml.ComputeSignature();
 
-            // as this is Xml Enveloped Signature,
-            // add the signature element to the original xml as the last child of the root element
+            // As this is XML Enveloped Signature, add the signature element to the original XML as the last child of the root element.
             xmldoc.DocumentElement.AppendChild(xmldoc.ImportNode(signedXml.GetXml(), true));
 
-            cancellationToken.ThrowIfCancellationRequested();
-
-            // output results either to a file or result object
+            // Output results either to a file or result object.
             if (output.OutputType == XmlParamType.File)
             {
                 xmlStream.Dispose();
 
                 if (output.AddSignatureToSourceFile)
                 {
-                    // signed xml document is written in target destination
+                    // Signed XML document is written in target destination.
                     xmldoc.Save(input.XmlFilePath);
 
-                    // and result will indicate the source file path
+                    // Result will indicate the source file path.
                     result.Result = input.XmlFilePath;
                 }
                 else
                 {
-                    // signed xml document is written in target destination
+                    // Signed XML document is written in target destination.
                     using (var writer = new XmlTextWriter(output.OutputFilePath, Encoding.GetEncoding(output.OutputEncoding)))
                     {
                         xmldoc.Save(writer);
                     }
 
-                    // and result will indicate the document path
+                    // Result will indicate the document path.
                     result.Result = output.OutputFilePath;
                 }
             }
             else
             {
-                // signed xml document is returned from task
+                // Signed XML document is returned from task.
                 result.Result = xmldoc.OuterXml;
             }
 
@@ -323,7 +293,8 @@ namespace Frends.Community.Xml
         }
 
         /// <summary>
-        /// Splits XML file into smaller files. See: https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// Splits XML file into smaller files.
+        /// See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="Input">Input XML to be split.</param>
         /// <param name="Options">Configuration for splitting the XML.</param>
@@ -333,34 +304,34 @@ namespace Frends.Community.Xml
         {
             int seqNr = 0;
             int loopSeqNr = 0;
-            List<string> returnArray = new List<string>();
+            var returnArray = new List<string>();
 
-            FileInfo fileInfo = new FileInfo(Input.InputFilePath);
-            DirectoryInfo dirInfo = new DirectoryInfo(Input.OutputFilesDirectory);
+            var fileInfo = new FileInfo(Input.InputFilePath);
+            var dirInfo = new DirectoryInfo(Input.OutputFilesDirectory);
 
-            using (XmlReader processDoc = XmlReader.Create(Input.InputFilePath, new XmlReaderSettings() { DtdProcessing = DtdProcessing.Ignore }))
+            using (var processDoc = XmlReader.Create(Input.InputFilePath, new XmlReaderSettings() { DtdProcessing = DtdProcessing.Ignore }))
             {
 
-                XmlDocument newDoc = InitiateNewDocument(Options.OutputFileRootNodeName);
+                var newDoc = InitiateNewDocument(Options.OutputFileRootNodeName);
 
                 while (processDoc.Read())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
                     // Second while is needed because Read() skips elements if there is no white space between them.
-                    // This happens because ReadInnerXml() (below) moves the reader to the next element and then Read() will skip it
+                    // This happens because ReadInnerXml() (below) moves the reader to the next element and then Read() will skip it.
                     while (processDoc.Name == Input.SplitAtElementName && processDoc.NodeType == XmlNodeType.Element && processDoc.ReadState != ReadState.EndOfFile)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        XmlElement outputNode = newDoc.CreateElement(processDoc.Name);
+                        var outputNode = newDoc.CreateElement(processDoc.Name);
                         outputNode.InnerXml = processDoc.ReadInnerXml();
                         newDoc.LastChild.AppendChild(outputNode);
 
-                        // Write new file when the max element count is reached
+                        // Write new file when the max element count is reached.
                         if (++loopSeqNr >= Options.ElementCountInEachFile)
                         {
-                            string outputFilePath = WriteToFile(fileInfo.Name, seqNr++, dirInfo.FullName, newDoc);
+                            var outputFilePath = WriteToFile(fileInfo.Name, seqNr++, dirInfo.FullName, newDoc);
                             returnArray.Add(outputFilePath);
                             loopSeqNr = 0;
                             newDoc = InitiateNewDocument(Options.OutputFileRootNodeName);
@@ -368,10 +339,10 @@ namespace Frends.Community.Xml
                     }
                 }
 
-                // If there are any leftover elements we create one last file
+                // If there are any leftover elements we create one last file.
                 if (processDoc.ReadState == ReadState.EndOfFile && loopSeqNr != 0)
                 {
-                    string outputFilePath = WriteToFile(fileInfo.Name, seqNr, dirInfo.FullName, newDoc);
+                    var outputFilePath = WriteToFile(fileInfo.Name, seqNr, dirInfo.FullName, newDoc);
                     returnArray.Add(outputFilePath);
                 }
             }
@@ -380,7 +351,8 @@ namespace Frends.Community.Xml
         }
 
         /// <summary>
-        /// A task to verify the signature of a signed XML. See: https://github.com/CommunityHiQ/Frends.Community.Xml
+        /// A task to verify the signature of a signed XML.
+        /// See: https://github.com/CommunityHiQ/Frends.Community.Xml
         /// </summary>
         /// <param name="input">Parameters for input XML.</param>
         /// <param name="options">Additional options for verifications.</param>
@@ -392,57 +364,44 @@ namespace Frends.Community.Xml
             var xmldoc = new XmlDocument() { PreserveWhitespace = options.PreserveWhitespace };
             StreamReader xmlStream = null;
 
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (input.XmlInputType == XmlParamType.File)
             {
                 xmlStream = new StreamReader(input.XmlFilePath);
                 xmldoc.Load(xmlStream);
             }
-            else
-            {
-                xmldoc.LoadXml(input.Xml);
-            }
+            else xmldoc.LoadXml(input.Xml);
 
-            // load the signature node
+            // Load the signature node.
             var signedXml = new SignedXml(xmldoc);
             signedXml.LoadXml((XmlElement)xmldoc.GetElementsByTagName("Signature")[0]);
 
             X509Certificate2 certificate = null;
 
-            foreach (KeyInfoClause clause in signedXml.KeyInfo)
+            foreach (var clause in signedXml.KeyInfo)
             {
-                if (clause is KeyInfoX509Data)
+                if (clause is KeyInfoX509Data data)
                 {
-                    if (((KeyInfoX509Data)clause).Certificates.Count > 0)
-                    {
-                        certificate = (X509Certificate2)((KeyInfoX509Data)clause).Certificates[0];
-                    }
+                    if (data.Certificates.Count > 0) certificate = (X509Certificate2)data.Certificates[0];
                 }
             }
-
-            cancellationToken.ThrowIfCancellationRequested();
 
             // Check the signature and return the result.
             result.IsValid = signedXml.CheckSignature(certificate, true);
 
-            // close stream if input was a file
-            if (input.XmlInputType == XmlParamType.File)
-            {
-                xmlStream.Dispose();
-            }
+            // Close stream if input was a file.
+            if (input.XmlInputType == XmlParamType.File) xmlStream.Dispose();
 
             return result;
         }
 
         private static XmlDocument InitiateNewDocument(string Rootname)
         {
-            XmlDocument newDoc = new XmlDocument();
-            XmlDeclaration xmlDeclaration = newDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
-            XmlElement root = newDoc.DocumentElement;
+            var newDoc = new XmlDocument();
+            var xmlDeclaration = newDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+            var root = newDoc.DocumentElement;
             newDoc.InsertBefore(xmlDeclaration, root);
 
-            XmlElement rootElement = newDoc.CreateElement(string.Empty, Rootname, string.Empty);
+            var rootElement = newDoc.CreateElement(string.Empty, Rootname, string.Empty);
             newDoc.AppendChild(rootElement);
 
             return newDoc;
@@ -450,8 +409,8 @@ namespace Frends.Community.Xml
 
         public static string WriteToFile(string InputName, int SeqNr, string OutputFolder, XmlDocument NewDoc)
         {
-            string strFileName = InputName + "." + SeqNr + ".part";
-            string outputFilePath = Path.Combine(OutputFolder, strFileName);
+            var strFileName = InputName + "." + SeqNr + ".part";
+            var outputFilePath = Path.Combine(OutputFolder, strFileName);
             NewDoc.Save(outputFilePath);
 
             return outputFilePath;
@@ -467,10 +426,7 @@ namespace Frends.Community.Xml
                 {
                     case JTokenType.Array:
                         var newArray = new JArray();
-                        foreach (var item in node.Value)
-                        {
-                            newArray.Add(ChangeNumericKeys(JObject.FromObject(item), appendWith));
-                        }
+                        foreach (var item in node.Value) newArray.Add(ChangeNumericKeys(JObject.FromObject(item), appendWith));
                         newO[node.Key] = newArray;
                         break;
                     case JTokenType.Object:
@@ -482,10 +438,7 @@ namespace Frends.Community.Xml
                             var newName = appendWith + node.Key;
                             newO[newName] = node.Value;
                         }
-                        else
-                        {
-                            newO[node.Key] = node.Value;
-                        }
+                        else newO[node.Key] = node.Value;
                         break;
                 }
             }
@@ -507,8 +460,12 @@ namespace Frends.Community.Xml
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var fields = row.ItemArray.Select(field => field.ToString());
-                fields = fields.Select(x => (x.Contains(separator) ? throw new XmlException("Field contains the separator") : x)); // Throws error incase field contains the separator
-                fields = fields.Select(x => (x.Contains("\n") || x.Contains("\"")) ? "\"" + x.Replace("\"", "\"\"") + "\"" : x); // Fixes cases where input field contains special characters
+
+                // Throws error in case field contains the separator.
+                fields = fields.Select(x => (x.Contains(separator) ? throw new XmlException("Field contains the separator") : x));
+
+                // Fixes cases where input field contains special characters.
+                fields = fields.Select(x => (x.Contains("\n") || x.Contains("\"")) ? "\"" + x.Replace("\"", "\"\"") + "\"" : x);
                 stringBuilder.AppendLine(string.Join(separator, fields));
             }
 

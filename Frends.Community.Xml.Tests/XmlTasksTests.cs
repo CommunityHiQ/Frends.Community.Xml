@@ -20,11 +20,7 @@ namespace Frends.Community.Xml.Tests
         public void TestSetup()
         {
             _tempOutputFolder = Path.Combine(Path.GetTempPath(), "splitxml_tests");
-
-            if (!Directory.Exists(_tempOutputFolder))
-            {
-                Directory.CreateDirectory(_tempOutputFolder);
-            }
+            if (!Directory.Exists(_tempOutputFolder)) Directory.CreateDirectory(_tempOutputFolder);
         }
 
         [TearDown]
@@ -52,22 +48,22 @@ namespace Frends.Community.Xml.Tests
 
             var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
-            //12 products should be split into 3 files
+            // 12 products should be split into 3 files.
             Assert.AreEqual(3, result.FilePaths.Count);
 
-            //Last file should have 4 Products
+            // Last file should have 4 Products.
             var productCount = ExecuteXpath(result.FilePaths.Last(), "string(count(/root/Product))");
             Assert.AreEqual("4", productCount);
 
-            //The Last Product of first file should have id 4
+            // The Last Product of first file should have id 4.
             var id = ExecuteXpath(result.FilePaths.First(), "string(/root/Product[last()]/id)");
             Assert.AreEqual("4", id);
 
-            //The second file should have 4 products
+            // The second file should have 4 products.
             var productCount2nd = ExecuteXpath(result.FilePaths[1], "string(count(/root/Product))");
             Assert.AreEqual("4", productCount2nd);
 
-            //The Last Product of second file should have id 8
+            // The Last Product of second file should have id 8.
             var id2nd = ExecuteXpath(result.FilePaths[1], "string(/root/Product[last()]/id)");
             Assert.AreEqual("8", id2nd);
         }
@@ -80,14 +76,14 @@ namespace Frends.Community.Xml.Tests
 
             var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
-            //12 products should be split into 2 files
+            // 12 products should be split into 2 files.
             Assert.AreEqual(2, result.FilePaths.Count);
 
-            //Last file should have 2 Products
+            // Last file should have 2 Products.
             var productCount = ExecuteXpath(result.FilePaths.Last(), "string(count(/root/Product))");
             Assert.AreEqual("2", productCount);
 
-            //The Last Product of first file should have id 10
+            // The Last Product of first file should have id 10.
             var id = ExecuteXpath(result.FilePaths.First(), "string(/root/Product[last()]/id)");
             Assert.AreEqual("10", id);
         }
@@ -95,18 +91,18 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void TestPrettyXML_notfull()
         {
-            string expectedRootElement = "TestRoot";
+            var expectedRootElement = "TestRoot";
 
             var input = new SplitXmlFileInput { InputFilePath = _prettyInputPath, OutputFilesDirectory = _tempOutputFolder, SplitAtElementName = "Product" };
             var opt = new SplitXmlFileOptions { ElementCountInEachFile = 20, OutputFileRootNodeName = expectedRootElement };
 
             var result = XmlTasks.SplitXmlFile(input, opt, new CancellationToken());
 
-            //Check root element
+            // Check root element.
             var rootElementName = ExecuteXpath(result.FilePaths.Last(), "local-name(/*)");
             Assert.AreEqual(expectedRootElement, rootElementName);
 
-            //The Last Product of first file should have id 12
+            // The Last Product of first file should have id 12.
             var id = ExecuteXpath(result.FilePaths.First(), "string(/TestRoot/Product[last()]/id)");
             Assert.AreEqual("12", id);
         }        
@@ -126,7 +122,7 @@ namespace Frends.Community.Xml.Tests
         [SetUp]
         public void TestSetup()
         {
-            // CombineXML setup
+            // CombineXML setup.
             _xmlString1 = "<?xml version=\"1.0\" encoding=\"utf-8\"?><bar1>foo1</bar1>";
             _xmlString2 = "<?xml version=\"1.0\" encoding=\"utf-8\"?><bar2>foo2</bar2>";
             _xmlDoc1.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><foo1>bar1</foo1>");
@@ -430,7 +426,7 @@ namespace Frends.Community.Xml.Tests
                 XmlSignatureMethod = XmlSignatureMethod.RSASHA256
             };
 
-            SigningResult result = XmlTasks.SignXml(input, output, options, new CancellationToken());
+            var result = XmlTasks.SignXml(input, output, options, new CancellationToken());
 
             StringAssert.Contains("<Signature", result.Result);
         }
@@ -438,8 +434,8 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void SignXml_ShouldSignXmlFileWithPrivateKeyCertificate()
         {
-            // create file
-            string xmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", Guid.NewGuid().ToString() + ".xml");
+            // Create file.
+            var xmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", Guid.NewGuid().ToString() + ".xml");
             File.WriteAllText(xmlFilePath, @"<root>
     <value>foo</value>
 </root>");
@@ -466,13 +462,13 @@ namespace Frends.Community.Xml.Tests
                 PreserveWhitespace = true
             };
 
-            SigningResult result = XmlTasks.SignXml(input, output, options, new CancellationToken());
+            var result = XmlTasks.SignXml(input, output, options, new CancellationToken());
             var signedXml = File.ReadAllText(result.Result);
 
             StringAssert.Contains("<Signature", signedXml);
             StringAssert.DoesNotContain("<Signature", File.ReadAllText(xmlFilePath));
 
-            // cleanup
+            // Cleanup.
             File.Delete(xmlFilePath);
             File.Delete(result.Result);
         }
@@ -480,8 +476,8 @@ namespace Frends.Community.Xml.Tests
         [Test]
         public void SignXml_ShouldAddSignatureToSourceFile()
         {
-            // create file
-            string xmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", Guid.NewGuid().ToString() + ".xml");
+            // Create file.
+            var xmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles", Guid.NewGuid().ToString() + ".xml");
             File.WriteAllText(xmlFilePath, @"<root>
     <value>foo</value>
 </root>");
@@ -507,12 +503,12 @@ namespace Frends.Community.Xml.Tests
                 PreserveWhitespace = true
             };
 
-            SigningResult result = XmlTasks.SignXml(input, output, options, new CancellationToken());
+            var result = XmlTasks.SignXml(input, output, options, new CancellationToken());
             var signedXml = File.ReadAllText(result.Result);
 
             StringAssert.Contains("<Signature", signedXml);
 
-            // cleanup
+            // Cleanup.
             File.Delete(xmlFilePath);
             File.Delete(result.Result);
         }
@@ -562,7 +558,7 @@ namespace Frends.Community.Xml.Tests
                 TransformMethods = new[] { TransformMethod.DsigExcC14 },
                 XmlSignatureMethod = XmlSignatureMethod.RSASHA256
             };
-            string signedXml = XmlTasks.SignXml(input, output, options, new CancellationToken()).Result;
+            var signedXml = XmlTasks.SignXml(input, output, options, new CancellationToken()).Result;
             var verifyInput = new VerifySignatureInput
             {
                 XmlInputType = XmlParamType.XmlString,
