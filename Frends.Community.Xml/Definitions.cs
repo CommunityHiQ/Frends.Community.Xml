@@ -7,17 +7,17 @@ using System.ComponentModel.DataAnnotations;
 namespace Frends.Community.Xml
 {
     /// <summary>
-    /// Input-class for CombineXML-task
+    /// Input-class for CombineXML-task.
     /// </summary>
     public class CombineXmlInput
     {
         /// <summary>
-        /// An array of XMLs with child element names
+        /// An array of XMLs with child element names.
         /// </summary>
         public CombineXmlInputXml[] InputXmls { set; get; }
 
         /// <summary>
-        /// The name of the root element
+        /// The name of the root element.
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue("\"Root\"")]
@@ -25,17 +25,17 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Class for an array of XMLs with child element names
+    /// Class for an array of XMLs with child element names.
     /// </summary>
     public class CombineXmlInputXml
     {
         /// <summary>
-        /// XML input as string or an XML document
+        /// XML input as string or an XML document.
         /// </summary>
         public object Xml { set; get; }
 
         /// <summary>
-        /// Child element name where the XML document will be written in
+        /// Child element name where the XML document will be written in.
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue("\"ChildElement\"")]
@@ -43,87 +43,88 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// An array of XMLs with child element names
+    /// An array of XMLs with child element names.
     /// </summary>
     public class ColumnLength
     {
         /// <summary>
-        /// Column length
+        /// Column length.
         /// </summary>
         public int Length { set; get; }
     }
 
     /// <summary>
-    /// JSON input class for ConvertToXml-task
+    /// JSON input class for ConvertToXml-task.
     /// </summary>
     public class ConvertToXmlJsonInputParameters
     {
         /// <summary>
-        /// The name of the root element on the XML
+        /// The name of the root element on the XML.
         /// </summary>
         public string XMLRootElementName { get; set; }
 
         /// <summary>
-        /// Append numeric JSON fields with prefix
+        /// Append numeric JSON fields with prefix.
         /// </summary>
         public string AppendToFieldName { get; set; }
     }
 
     /// <summary>
-    /// CSV input class for ConvertToXml-task
+    /// CSV input class for ConvertToXml-task.
     /// </summary>
     public class ConvertToXmlCsvInputParameters
     {
         /// <summary>
-        /// Separator used in the CSV
+        /// Separator used in the CSV.
         /// </summary>
         public string CSVSeparator { get; set; }
 
         /// <summary>
-        /// Output column lengths
+        /// Output column lengths.
         /// </summary>
         public ColumnLength[] ColumnLengths { get; set; }
 
         /// <summary>
-        /// Input CSV has a header row
+        /// Input CSV has a header row.
         /// </summary>
         public bool InputHasHeaderRow { get; set; }
 
         /// <summary>
-        /// Trim output columns
+        /// Trim output columns.
         /// </summary>
         public bool TrimOuputColumns { get; set; }
     }
 
     /// <summary>
-    /// Input class for ConvertToXml-task
+    /// Input class for ConvertToXml-task.
     /// </summary>
     public class ConvertToXmlParameters
     {
         /// <summary>
-        /// Input data. Supported formats JSON, CSV and fixed length
+        /// Input data.
+        /// Supported formats JSON, CSV and fixed length.
         /// </summary>
         public string Input { get; set; }
     }
 
     /// <summary>
-    /// Output class for ConvertToXml-task
+    /// Output class for ConvertToXml-task.
     /// </summary>
     public class ConvertToXmlOutput
     {
         /// <summary>
-        /// Result string
+        /// Result string.
         /// </summary>
         public string Result { get; set; }
     }
 
     /// <summary>
-    /// Input class for ConvertXmlToCsv-task
+    /// Input class for ConvertXmlToCsv-task.
     /// </summary>
     public class ConvertXmlToCsvInput
     {
         /// <summary>
-        /// XML string to be converted into csv
+        /// XML string to be converted into csv.
         /// </summary>
         [DisplayName("Input XML as string")]
         public string InputXmlString { get; set; }
@@ -142,28 +143,29 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Output class for ConvertXmlToCsv-task
+    /// Output class for ConvertXmlToCsv-task.
     /// </summary>
     public class ConvertXmlToCsvOutput
     {
         /// <summary>
-        /// Result csv
+        /// Result CSV.
         /// </summary>
         public string Result { get; set; }
     }
 
     /// <summary>
-    /// Input class for SignXml-task
+    /// Input class for SignXml-task.
     /// </summary>
     public class SignXmlInput
     {
         /// <summary>
-        /// Input type. Possible types are File and XmlString
+        /// Input type.
+        /// Possible types are File and XmlString.
         /// </summary>
         public XmlParamType XmlInputType { get; set; }
 
         /// <summary>
-        /// Path to xml document to sign
+        /// Path to XML document to sign.
         /// </summary>
         [DefaultValue("c:\\temp\\document.xml")]
         [DisplayFormat(DataFormatString = "Text")]
@@ -171,7 +173,7 @@ namespace Frends.Community.Xml
         public string XmlFilePath { get; set; }
 
         /// <summary>
-        /// XML to sign
+        /// XML to sign.
         /// </summary>
         [DefaultValue("<root><value>123</value></root>")]
         [DisplayFormat(DataFormatString = "Xml")]
@@ -179,17 +181,17 @@ namespace Frends.Community.Xml
         public string Xml { get; set; }
 
         /// <summary>
-        /// XML signing technique to use
+        /// XML signing technique to use.
         /// </summary>
         public XmlEnvelopingType XmlEnvelopingType { get; set; }
 
         /// <summary>
-        /// How to sign the document
+        /// How to sign the document.
         /// </summary>
         public SigningStrategyType SigningStrategy { get; set; }
 
         /// <summary>
-        /// Path to certificate with private key
+        /// Path to certificate with private key.
         /// </summary>
         [DefaultValue("c:\\certificates\\signingcertificate.pfx")]
         [DisplayFormat(DataFormatString = "Text")]
@@ -197,7 +199,7 @@ namespace Frends.Community.Xml
         public string CertificatePath { get; set; }
 
         /// <summary>
-        /// Private key password
+        /// Private key password.
         /// </summary>
         [PasswordPropertyText]
         [UIHint(nameof(SigningStrategy), "", SigningStrategyType.PrivateKeyCertificate)]
@@ -205,17 +207,17 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Output class for SignXml-task
+    /// Output class for SignXml-task.
     /// </summary>
     public class SignXmlOutput
     {
         /// <summary>
-        /// Output to file or xml string?
+        /// Output to file or XML string?
         /// </summary>
         public XmlParamType OutputType { get; set; }
 
         /// <summary>
-        /// A filepath for the output XML
+        /// A filepath for the output XML.
         /// </summary>
         [DefaultValue("c:\\temp\\signedOutput.xml")]
         [DisplayFormat(DataFormatString = "Text")]
@@ -223,7 +225,7 @@ namespace Frends.Community.Xml
         public string OutputFilePath { get; set; }
 
         /// <summary>
-        /// The encoding for the output file
+        /// The encoding for the output file.
         /// </summary>
         [DefaultValue("UTF-8")]
         [DisplayFormat(DataFormatString = "Text")]
@@ -231,19 +233,19 @@ namespace Frends.Community.Xml
         public string OutputEncoding { get; set; }
 
         /// <summary>
-        /// If source is file, then you can add signature to it
+        /// If source is file, then you can add signature to it.
         /// </summary>
         [UIHint(nameof(OutputType), "", XmlParamType.File)]
         public bool AddSignatureToSourceFile { get; set; }
     }
 
     /// <summary>
-    /// Options class for SignXml-task
+    /// Options class for SignXml-task.
     /// </summary>
     public class SignXmlOptions
     {
         /// <summary>
-        /// Switch to include comments
+        /// Switch to include comments.
         /// </summary>
         public bool IncludeComments { get; set; }
 
@@ -253,34 +255,35 @@ namespace Frends.Community.Xml
         public bool PreserveWhitespace { get; set; }
 
         /// <summary>
-        /// Signature methods to be used with signing
+        /// Signature methods to be used with signing.
         /// </summary>
         public XmlSignatureMethod XmlSignatureMethod { get; set; }
 
         /// <summary>
-        /// Digest methods to be used
+        /// Digest methods to be used.
         /// </summary>
         public DigestMethod DigestMethod { get; set; }
 
         /// <summary>
-        /// Transform methods to be used
+        /// Transform methods to be used.
         /// </summary>
         public TransformMethod[] TransformMethods { get; set; }
     }
 
     /// <summary>
-    /// Output class for SignXml-task
+    /// Output class for SignXml-task.
     /// </summary>
     public class SigningResult
     {
         /// <summary>
-        /// If output type is file, this will be a filepath. Otherwise, this will be the signed XML as string.
+        /// If output type is file, this will be a filepath.
+        /// Otherwise, this will be the signed XML as string.
         /// </summary>
         public string Result { get; set; }
     }
 
     /// <summary>
-    /// Can be either a file or an XML string
+    /// Can be either a file or an XML string.
     /// </summary>
     public enum XmlParamType
     {
@@ -289,7 +292,7 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// XML signature strategy for SignXml-task
+    /// XML signature strategy for SignXml-task.
     /// </summary>
     public enum SigningStrategyType
     {
@@ -297,7 +300,7 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Signature enveloping type for SignXml-task
+    /// Signature enveloping type for SignXml-task.
     /// </summary>
     public enum XmlEnvelopingType
     {
@@ -305,7 +308,7 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Signature methods for XMLDSIG
+    /// Signature methods for XMLDSIG.
     /// </summary>
     public enum XmlSignatureMethod
     {
@@ -316,7 +319,7 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Transform methods
+    /// Transform methods.
     /// </summary>
     public enum TransformMethod
     {
@@ -328,7 +331,7 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Digest methods
+    /// Digest methods.
     /// </summary>
     public enum DigestMethod
     {
@@ -339,26 +342,26 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Input class for SplitXmlFile-task
+    /// Input class for SplitXmlFile-task.
     /// </summary>
     public class SplitXmlFileInput
     {
         /// <summary>
-        /// Path to the input file
+        /// Path to the input file.
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue(@"F:\myfile.xml")]
         public string InputFilePath { get; set; }
 
         /// <summary>
-        /// Name of the XML elements which are copied to output files
+        /// Name of the XML elements which are copied to output files.
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue(@"Product")]
         public string SplitAtElementName { get; set; }
 
         /// <summary>
-        /// Output directory for new files
+        /// Output directory for new files.
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue(@"F:\output")]
@@ -366,18 +369,18 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Options class for SplitXmlFile-task
+    /// Options class for SplitXmlFile-task.
     /// </summary>
     public class SplitXmlFileOptions
     {
         /// <summary>
-        /// Maximum number of chosen elements to be written in each file
+        /// Maximum number of chosen elements to be written in each file.
         /// </summary>
         [DefaultValue(5000)]
         public int ElementCountInEachFile { get; set; }
 
         /// <summary>
-        /// The name of the root element for the output file
+        /// The name of the root element for the output file.
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue("Root")]
@@ -385,28 +388,28 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Output class for SplitXml-task
+    /// Output class for SplitXml-task.
     /// </summary>
     public class SplitXmlFileResult
     {
         /// <summary>
-        /// List of filepaths to the new files
+        /// List of filepaths to the new files.
         /// </summary>
         public List<string> FilePaths;
     }
 
     /// <summary>
-    /// Input class for VerifySignedXml-task
+    /// Input class for VerifySignedXml-task.
     /// </summary>
     public class VerifySignatureInput
     {
         /// <summary>
-        /// Either an XML string or a filepath
+        /// Either an XML string or a filepath.
         /// </summary>
         public XmlParamType XmlInputType { get; set; }
 
         /// <summary>
-        /// Path to the XML document
+        /// Path to the XML document.
         /// </summary>
         [DefaultValue("c:\\temp\\documentToVerify.xml")]
         [DisplayFormat(DataFormatString = "Text")]
@@ -414,7 +417,7 @@ namespace Frends.Community.Xml
         public string XmlFilePath { get; set; }
 
         /// <summary>
-        /// XML in string format
+        /// XML in string format.
         /// </summary>
         [DisplayFormat(DataFormatString = "Xml")]
         [UIHint(nameof(XmlInputType), "", XmlParamType.XmlString)]
@@ -422,7 +425,7 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Options class for VerifySignedXml-task
+    /// Options class for VerifySignedXml-task.
     /// </summary>
     public class VerifySignatureOptions
     {
@@ -433,12 +436,13 @@ namespace Frends.Community.Xml
     }
 
     /// <summary>
-    /// Output class for VerifySignedXml-task
+    /// Output class for VerifySignedXml-task.
     /// </summary>
     public class VerifySignatureResult
     {
         /// <summary>
-        /// True, if valid. Otherwise, false.
+        /// True, if valid.
+        /// Otherwise, false.
         /// </summary>
         public bool IsValid { get; set; }
     }
