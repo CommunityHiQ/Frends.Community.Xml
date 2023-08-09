@@ -75,7 +75,7 @@ namespace Frends.Community.Xml
         /// <param name="jsonInputParameters">Parameters for conversion from JSON to XML.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Object { string Result }</returns>
-        public static ConvertToXmlOutput ConvertToXml(ConvertToXmlParameters parameters, [PropertyTab] ConvertToXmlCsvInputParameters csvInputParameters, [PropertyTab] ConvertToXmlJsonInputParameters jsonInputParameters, CancellationToken cancellationToken)
+        public static ConvertToXmlOutput ConvertToXml([PropertyTab] ConvertToXmlParameters parameters, [PropertyTab] ConvertToXmlCsvInputParameters csvInputParameters, [PropertyTab] ConvertToXmlJsonInputParameters jsonInputParameters, CancellationToken cancellationToken)
         {
             if (parameters.Input.GetType() != typeof(string))
                 throw new InvalidDataException("The input data string was not in correct format. Supported formats are JSON, CSV and fixed length.");

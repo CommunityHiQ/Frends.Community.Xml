@@ -6,12 +6,12 @@ Frends Community Task library for XML operations
 
 - [Installing](#installing)
 - [Tasks](#tasks)
-     - [CombineXML](#CombineXML)
-     - [ConvertToXML](#ConvertToXML)
-     - [ConvertXmlToCsv](#ConvertXmlToCsv)
-     - [SignXml](#SignXml)
-     - [SplitXMLFile](#SplitXMLFile)
-     - [VerifySignedXml](#VerifySignedXml)
+     - [CombineXML](#combinexml)
+     - [ConvertToXML](#converttoxml)
+     - [ConvertXmlToCsv](#convertxmltocsv)
+     - [SignXml](#signxml)
+     - [SplitXMLFile](#splitxmlfile)
+     - [VerifySignedXml](#verifysignedxml)
 - [Building](#building)
 - [Contributing](#contributing)
 - [Change Log](#change-log)
@@ -339,3 +339,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 1.0.0   | First version. Includes task SplitXmlFile |
 | 2.0.0   | CombineXml, ConvertToXml, ConvertXmlToCsv, SignXml and VerifySignedXml tasks included. |
 | 2.0.1   | Fixed issue #3 by creating throw when separator is used in input. |
+| 2.0.2   | ConvertToXml: Added PropertyTab to Input. |
