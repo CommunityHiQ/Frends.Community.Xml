@@ -340,3 +340,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 2.0.0   | CombineXml, ConvertToXml, ConvertXmlToCsv, SignXml and VerifySignedXml tasks included. |
 | 2.0.1   | Fixed issue #3 by creating throw when separator is used in input. |
 | 2.0.2   | ConvertToXml: Added PropertyTab to Input. |
+| 3.0.0   | Added target frameworks net6 & net8. Updated dependencies: downgraded Newtonsoft.Json to 12.0.1, upgraded GenericParsing to 1.5.0, System.Security.Cryptography.Xml to 8.0.0. Test dependencies: upgraded NUnit3TestAdapter to 4.6.0, Microsoft.NET.Test.Sdk to 17.12.0. |
